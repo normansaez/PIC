@@ -194,7 +194,16 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
 
                 break;
 
-            case '8': //motor 3 a la derecha.
+            case '8': 
+            sensortest:
+                status = input_state(PIN_A5);
+                if (status == 0)
+                    printf("sensor tapado: ->%d<-  \n\r",status);
+                if (status == 1)
+                    printf("sensor libre: ->%d<-  \n\r",status);
+                goto sensortest;
+
+            case '9': //motor 3 a la derecha.
                 //printf("Setup calibracion\n\r");
                 steps = 0;
                 der_steps = 0;
