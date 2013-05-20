@@ -85,7 +85,7 @@ void main()
         output_low(PIN_A4);
 
 
-        printf("Seleccione a, b, e, 1, 2, 3, 4, 5, 6 o 7.\n\r");
+        printf("Seleccione a, b, e, 1, 2, 3, 4, 5, 6 , 7. 8 =test, 9= cal\n\r");
         seleccionar=getc();
 
 
@@ -196,6 +196,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
 
             case '8': 
             sensortest:
+                delay_us(200);
                 status = input_state(PIN_A5);
                 if (status == 0)
                     printf("sensor tapado: ->%d<-  \n\r",status);
@@ -270,7 +271,9 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 goto otravez;
             otravez:
                 motores(izq_steps,0);
+                delay_us(200);
                 motores(der_steps,1);
+                delay_us(200);
                 goto otravez;
 
             case '7': // PWMs-LEDs
