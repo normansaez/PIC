@@ -12,7 +12,6 @@
 #use fast_io(b)
 
 motores(int32 pasos, int dir);
-//hola
 void main()
 {
 
