@@ -409,7 +409,7 @@ int motores2(int32 pasos, int dir)
     {
         output_high(PIN_A0);
     }
-    delay_ms(500);
+    delay_ms(100);
     for(y;y<pasos;y++)
     {
         output_low(PIN_A1);
