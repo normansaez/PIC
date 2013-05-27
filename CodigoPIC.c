@@ -49,12 +49,12 @@ void main()
     char expo[5];
     int16 exposicion=500;   //Tiempo de exposición de la cámara en [ms]
     int aux=1;
-    int1 status;
-    int direccion;
-    int error;
-    int32 steps;
-    int32 der_steps;
-    int32 izq_steps;
+    int1 status=1;
+    int direccion=1;
+    int error=0;
+    int32 steps=0;
+    int32 der_steps=0;
+    int32 izq_steps=0;
 
     output_low(PIN_B0);
     output_low(PIN_B1);
@@ -205,58 +205,58 @@ sensortest:
                 goto sensortest;
 
             case '9': //motor 3 a la derecha.
-                //printf("Setup calibracion\n\r");
+                printf("Setup calibracion\n\r");
                 steps = 0;
                 der_steps = 0;
                 izq_steps = 0;
                 direccion = 1; //a la derecha
 calibra1:
                 //printf("calibra1\n\r");
-                steps = 100;
+                steps = 500;
                 output_high(PIN_A4); // Activa motor 1
                 motores2(steps,direccion);
-                steps = steps + 100;
+                steps = steps + 500;
                 status = input_state(PIN_A5);
-                //printf("calibra1: direccion ->%d<-  \n\r",direccion);
-                //printf("calibra1: status sensor ->%d<-  \n\r",status);
-                //printf("calibra1: steps ->%Lu<-  \n\r",steps);
+                printf("calibra1: direccion ->%d<-  \n\r",direccion);
+                printf("calibra1: status sensor ->%d<-  \n\r",status);
+                //printf("calibra1: steps ->%Ld<-  \n\r",steps);
                 if (status == 0){ //sensor tapado:
                     direccion = 0; // a la izquierda
                     steps = 0;
                     goto calibraIzq;
                 }else{
-                    steps = steps + 100;
+                    steps = steps + 500;
                     goto calibra1;
                 };
 calibraIzq:
                 //printf("calibraIzq\n\r");
-                izq_steps = 100;
+                izq_steps = 500;
                 output_high(PIN_A4); // Activa motor 1
                 motores2(izq_steps,direccion);
                 status = input_state(PIN_A5);
                 //printf("calibraIzq: direccion ->%d<-  \n\r",direccion);
                 //printf("calibraIzq: status sensor->%d<-  \n\r",status);
-                //printf("calibraIzq: steps ->%Lu<-  \n\r",izq_steps);
+                printf("calibraIzq: steps ->%Ld<-  \n\r",izq_steps);
                 if (status == 0){ //sensor tapado:
                     direccion = 0; // a la izquierda
                     goto calibraDer;
                 }else{
-                    izq_steps = izq_steps + 100;
+                    izq_steps = izq_steps + 500;
                     goto calibraIzq;
                 };
 calibraDer:
                 //printf("calibraDer\n\r");
-                der_steps = 100;
+                der_steps = 500;
                 output_high(PIN_A4); // Activa motor 1
                 motores2(der_steps,direccion);
                 status = input_state(PIN_A5);
                 //printf("calibraDer: direccion ->%d<-  \n\r",direccion);
                 //printf("calibraDer: status sensor->%d<-  \n\r",status);
-                //printf("calibraDer: steps ->%Lu<-  \n\r",der_steps);
+                printf("calibraDer: steps ->%Ld<-  \n\r",der_steps);
                 if (status == 0){ //sensor tapado:
                     goto muevete;
                 }else{
-                    der_steps = der_steps + 100;
+                    der_steps = der_steps + 500;
                     goto calibraDer;
                 };
 
@@ -264,10 +264,12 @@ muevete:
                 //printf("Setup muevete\n\r");
                 error = 1000;
                 output_high(PIN_A4); // Activa motor 1.
+                printf("sin restar error: izq_steps ->%Ld<-  \n\r",izq_steps);
+                printf("sin restar error: der_steps ->%Ld<-  \n\r",der_steps);
                 izq_steps = abs(izq_steps - error);
                 der_steps = abs(der_steps - error);
-                printf("muevete: izq_steps ->%Lu<-  \n\r",izq_steps);
-                printf("muevete: der_steps ->%Lu<-  \n\r",der_steps);
+                printf("abs(izq_steps - error) = ->%Ld<-  \n\r",izq_steps);
+                printf("abs(der_steps - error) = ->%Ld<-  \n\r",der_steps);
                 goto otravez;
 otravez:
                 motores2(izq_steps,0);
@@ -294,16 +296,16 @@ otravez:
                 for(aux;aux<3;aux++)
                 {
 
-                    printf("for");
+//                    printf("for");
                     delay_ms(retardo);   // Delay para tener LED encendido y luego iniciar trigger CCD.
-                    printf("pasa retardo");
+//                    printf("pasa retardo");
                     output_high(PIN_B5); //Activa trigger CCD.
                     delay_ms(t_on);
                     output_low(PIN_B5);  //Desactiva trigger CCD.
-                    printf("antes de morir");
+//                    printf("antes de morir");
                     delay_ms(exposicion+retardo-t_on); // Mantiene control en LLL=> Salida Y0=1 (High) y el resto 0 (Low).
 
-                    printf("for1");
+//                    printf("for1");
                     output_high(PIN_B0);
                     delay_ms(retardo);
                     output_high(PIN_B5); //Activa trigger CCD.
@@ -311,7 +313,7 @@ otravez:
                     output_low(PIN_B5);
                     delay_ms(exposicion+retardo-t_on);
                     output_low(PIN_B0);
-                    printf("for2");
+//                    printf("for2");
                     output_high(PIN_B1);
                     delay_ms(retardo);
                     output_high(PIN_B5); //Activa trigger CCD.
@@ -319,7 +321,7 @@ otravez:
                     output_low(PIN_B5);
                     delay_ms(exposicion+retardo-t_on);
 
-                    printf("for3");
+//                    printf("for3");
                     output_high(PIN_B0);
                     delay_ms(retardo);
                     output_high(PIN_B5); //Activa trigger CCD.
@@ -327,7 +329,7 @@ otravez:
                     output_low(PIN_B5);
                     delay_ms(exposicion+retardo-t_on);
 
-                    printf("for4");
+//                    printf("for4");
                     output_low(PIN_B0);
                     output_low(PIN_B1);
                     output_high(PIN_B2);
@@ -337,7 +339,7 @@ otravez:
                     output_low(PIN_B5);
                     delay_ms(exposicion+retardo-t_on);
 
-                    printf("for5");
+//                    printf("for5");
                     output_high(PIN_B0);
                     delay_ms(retardo);
                     output_high(PIN_B5); //Activa trigger CCD.
@@ -345,7 +347,7 @@ otravez:
                     output_low(PIN_B5);
                     delay_ms(exposicion+retardo-t_on);
 
-                    printf("for6");
+//                    printf("for6");
                     output_low(PIN_B0);
                     output_high(PIN_B1);
                     delay_ms(retardo);
@@ -354,7 +356,7 @@ otravez:
                     output_low(PIN_B5);
                     delay_ms(exposicion+retardo-t_on);
 
-                    printf("for7");
+//                    printf("for7");
                     output_high(PIN_B0);
                     delay_ms(retardo);
                     output_high(PIN_B5); //Activa trigger CCD.
@@ -362,14 +364,14 @@ otravez:
                     output_low(PIN_B5);
                     delay_ms(exposicion+retardo-t_on);
 
-                    printf("for setea a cero\n\r");
+//                    printf("for setea a cero\n\r");
                     output_low(PIN_B0);  //Setea a 0 los pines para dejarlos como al inicio.
                     output_low(PIN_B1);
                     output_low(PIN_B2);
                     output_low(PIN_B3);
                     output_low(PIN_B4);
 
-                    printf("Ha operado una matriz");
+//                    printf("Ha operado una matriz");
                     printf("\n\r");
                     if(aux==2)
                     {
@@ -377,7 +379,7 @@ otravez:
                     }
 
                     output_high(PIN_B4); // Activa Enable Matriz Bpara iniciar el demux en 000.
-                    printf("un B4 high\n\r");
+//                    printf("un B4 high\n\r");
                 }
 salir:
                 output_low(PIN_B3);
@@ -495,7 +497,7 @@ apagamotor: // Label para apagar motor y cesar el giro.
         output_low(PIN_A3);
         output_low(PIN_A4);
 
-        printf("fin operacion\n\r");
+//        printf("fin operacion\n\r");
 
     }
 
