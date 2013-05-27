@@ -51,7 +51,7 @@ void main()
     int aux=1;
     int1 status=1;
     int direccion=1;
-    int error=0;
+    int32 error=0;
     int32 steps=0;
     int32 der_steps=0;
     int32 izq_steps=0;
