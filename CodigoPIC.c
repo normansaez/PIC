@@ -264,10 +264,10 @@ muevete:
                 //printf("Setup muevete\n\r");
                 error = 1000;
                 output_high(PIN_A4); // Activa motor 1.
-                izq_steps = izq_steps - error;
-                der_steps = der_steps - error;
-                //printf("muevete: izq_steps ->%Lu<-  \n\r",izq_steps);
-                //printf("muevete: der_steps ->%Lu<-  \n\r",der_steps);
+                izq_steps = abs(izq_steps - error);
+                der_steps = abs(der_steps - error);
+                printf("muevete: izq_steps ->%Lu<-  \n\r",izq_steps);
+                printf("muevete: der_steps ->%Lu<-  \n\r",der_steps);
                 goto otravez;
 otravez:
                 motores2(izq_steps,0);
