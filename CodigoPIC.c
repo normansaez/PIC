@@ -206,13 +206,12 @@ sensortest:
 
             case '9': //motor 3 a la derecha.
                 printf("Setup calibracion\n\r");
-                steps = 0;
-                der_steps = 0;
-                izq_steps = 0;
+                steps = 500;
+                der_steps = 500;
+                izq_steps = 500;
                 direccion = 1; //a la derecha
 calibra1:
                 //printf("calibra1\n\r");
-                steps = 500;
                 output_high(PIN_A4); // Activa motor 1
                 motores2(steps,direccion);
                 steps = steps + 500;
@@ -230,7 +229,6 @@ calibra1:
                 };
 calibraIzq:
                 //printf("calibraIzq\n\r");
-                izq_steps = 500;
                 output_high(PIN_A4); // Activa motor 1
                 motores2(izq_steps,direccion);
                 status = input_state(PIN_A5);
@@ -246,7 +244,6 @@ calibraIzq:
                 };
 calibraDer:
                 //printf("calibraDer\n\r");
-                der_steps = 500;
                 output_high(PIN_A4); // Activa motor 1
                 motores2(der_steps,direccion);
                 status = input_state(PIN_A5);
@@ -273,9 +270,9 @@ muevete:
                 goto otravez;
 otravez:
                 motores2(izq_steps,0);
-                delay_us(500);
+                delay_us(200);
                 motores2(der_steps,1);
-                delay_us(500);
+                delay_us(200);
                 goto otravez;
 
             case '7': // PWMs-LEDs
