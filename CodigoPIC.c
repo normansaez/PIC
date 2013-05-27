@@ -13,6 +13,7 @@
 
 motores(int32 pasos, int dir);
 motores2(int32 pasos, int dir);
+int32 motores3(int32 pasos, int dir);
 void main()
 {
 
@@ -195,14 +196,25 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 break;
 
             case '8': 
-sensortest:
-                delay_us(200);
-                status = input_state(PIN_A5);
-                if (status == 0)
-                    printf("sensor tapado: ->%d<-  \n\r",status);
-                if (status == 1)
-                    printf("sensor libre: ->%d<-  \n\r",status);
-                goto sensortest;
+//sensortest:
+//                delay_us(200);
+//                status = input_state(PIN_A5);
+//                if (status == 0)
+//                    printf("sensor tapado: ->%d<-  \n\r",status);
+//                if (status == 1)
+//                    printf("sensor libre: ->%d<-  \n\r",status);
+//                goto sensortest;
+                printf("Setup calibracion quick\n\r");
+                der_steps = 500;
+                izq_steps = 500;
+                direccion = 1; //a la derecha
+                output_high(PIN_A4); // Activa motor 1
+                motores3(900000,direccion);
+                direccion = 0; //IZQ
+                izq_steps = motores3(900000,direccion);
+                direccion = 1; //DER
+                der_steps = motores3(900000,direccion);
+                goto muevete;
 
             case '9': //motor 3 a la derecha.
                 printf("Setup calibracion\n\r");
@@ -214,7 +226,6 @@ calibra1:
                 //printf("calibra1\n\r");
                 output_high(PIN_A4); // Activa motor 1
                 motores2(steps,direccion);
-                steps = steps + 500;
                 status = input_state(PIN_A5);
                 printf("calibra1: direccion ->%d<-  \n\r",direccion);
                 printf("calibra1: status sensor ->%d<-  \n\r",status);
@@ -224,13 +235,12 @@ calibra1:
                     steps = 0;
                     goto calibraIzq;
                 }else{
-                    steps = steps + 500;
                     goto calibra1;
                 };
 calibraIzq:
                 //printf("calibraIzq\n\r");
                 output_high(PIN_A4); // Activa motor 1
-                motores2(izq_steps,direccion);
+                motores2(steps,direccion);
                 status = input_state(PIN_A5);
                 //printf("calibraIzq: direccion ->%d<-  \n\r",direccion);
                 //printf("calibraIzq: status sensor->%d<-  \n\r",status);
@@ -245,7 +255,7 @@ calibraIzq:
 calibraDer:
                 //printf("calibraDer\n\r");
                 output_high(PIN_A4); // Activa motor 1
-                motores2(der_steps,direccion);
+                motores2(steps,direccion);
                 status = input_state(PIN_A5);
                 //printf("calibraDer: direccion ->%d<-  \n\r",direccion);
                 //printf("calibraDer: status sensor->%d<-  \n\r",status);
@@ -394,6 +404,32 @@ salir:
 
 
 }  //FIN MAIN
+int32 motores3(int32 pasos, int dir)
+{
+    int32 y=0;
+    int1 status=1;
+    output_low(PIN_A1);  //STEP
+    if(dir==0)
+    {
+        output_low(PIN_A0);
+    }
+    if(dir==1)
+    {
+        output_high(PIN_A0);
+    }
+    delay_ms(100);
+    for(y;y<pasos;y++)
+    {
+        output_low(PIN_A1);
+        output_high(PIN_A1);
+        status = input_state(PIN_A5);
+        if (status == 0)
+            return y;
+        delay_us(200);
+    }
+    return y;
+}
+
 int motores2(int32 pasos, int dir)
 {
     int32 y=0;
@@ -413,6 +449,7 @@ int motores2(int32 pasos, int dir)
         output_high(PIN_A1);
         delay_us(200);
     }
+    return 0;
 }
 
 
