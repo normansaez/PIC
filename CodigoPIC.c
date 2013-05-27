@@ -210,8 +210,12 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 direccion = 1; //a la derecha
                 output_high(PIN_A4); // Activa motor 1
                 motores3(900000,direccion);
+                delay_us(200);
+                motores3(100,0);
                 direccion = 0; //IZQ
                 izq_steps = motores3(900000,direccion);
+                delay_us(200);
+                motores3(100,1);
                 direccion = 1; //DER
                 der_steps = motores3(900000,direccion);
                 goto muevete;
@@ -227,12 +231,12 @@ calibra1:
                 output_high(PIN_A4); // Activa motor 1
                 motores2(steps,direccion);
                 status = input_state(PIN_A5);
-                printf("calibra1: direccion ->%d<-  \n\r",direccion);
-                printf("calibra1: status sensor ->%d<-  \n\r",status);
+                //printf("calibra1: direccion ->%d<-  \n\r",direccion);
+                //printf("calibra1: status sensor ->%d<-  \n\r",status);
                 //printf("calibra1: steps ->%Ld<-  \n\r",steps);
                 if (status == 0){ //sensor tapado:
                     direccion = 0; // a la izquierda
-                    steps = 0;
+                    printf("calibra1: status sensor ->%d<-  \n\r",status);
                     goto calibraIzq;
                 }else{
                     goto calibra1;
@@ -246,6 +250,7 @@ calibraIzq:
                 //printf("calibraIzq: status sensor->%d<-  \n\r",status);
                 printf("calibraIzq: steps ->%Ld<-  \n\r",izq_steps);
                 if (status == 0){ //sensor tapado:
+                    printf("calibraIzq: status sensor ->%d<-  \n\r",status);
                     direccion = 1; // a la der
                     goto calibraDer;
                 }else{
@@ -261,6 +266,7 @@ calibraDer:
                 //printf("calibraDer: status sensor->%d<-  \n\r",status);
                 printf("calibraDer: steps ->%Ld<-  \n\r",der_steps);
                 if (status == 0){ //sensor tapado:
+                    printf("calibraDer: status sensor ->%d<-  \n\r",status);
                     goto muevete;
                 }else{
                     der_steps = der_steps + 500;
@@ -269,7 +275,7 @@ calibraDer:
 
 muevete:
                 //printf("Setup muevete\n\r");
-                error = 1000;
+                error = 0;
                 output_high(PIN_A4); // Activa motor 1.
                 printf("sin restar error: izq_steps ->%Ld<-  \n\r",izq_steps);
                 printf("sin restar error: der_steps ->%Ld<-  \n\r",der_steps);
@@ -379,7 +385,7 @@ otravez:
                     output_low(PIN_B4);
 
 //                    printf("Ha operado una matriz");
-                    printf("\n\r");
+//                    printf("\n\r");
                     if(aux==2)
                     {
                         goto salir;
