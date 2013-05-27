@@ -207,17 +207,16 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 printf("Setup calibracion quick\n\r");
                 der_steps = 500;
                 izq_steps = 500;
-                direccion = 1; //a la derecha
-                output_high(PIN_A4); // Activa motor 1
-                motores3(900000,direccion);
+                output_high(PIN_A4); 
+                motores3(2147483640,1);
                 delay_us(200);
-                motores3(100,0);
-                direccion = 0; //IZQ
-                izq_steps = motores3(900000,direccion);
+                motores2(100,0);
                 delay_us(200);
-                motores3(100,1);
-                direccion = 1; //DER
-                der_steps = motores3(900000,direccion);
+                izq_steps = motores3(2147483640,0);
+                delay_us(200);
+                motores2(100,1);
+                delay_us(200);
+                der_steps = motores3(2147483640,1);
                 goto muevete;
 
             case '9': //motor 3 a la derecha.
@@ -429,8 +428,10 @@ int32 motores3(int32 pasos, int dir)
         output_low(PIN_A1);
         output_high(PIN_A1);
         status = input_state(PIN_A5);
-        if (status == 0)
+        if (status == 0){
+            printf("status sensor ->%d<-  \n\r",status);
             return y;
+        }
         delay_us(200);
     }
     return y;
