@@ -238,7 +238,7 @@ calibraIzq:
                 //printf("calibraIzq: status sensor->%d<-  \n\r",status);
                 printf("calibraIzq: steps ->%Ld<-  \n\r",izq_steps);
                 if (status == 0){ //sensor tapado:
-                    direccion = 0; // a la izquierda
+                    direccion = 1; // a la der
                     goto calibraDer;
                 }else{
                     izq_steps = izq_steps + 500;
@@ -290,7 +290,7 @@ otravez:
                 output_low(PIN_B4);
                 output_low(PIN_B5);
                 delay_ms(100);    //delay de 100ms para luego iniciar secuencia de control del DEMUX
-                printf("Corriendo Matriz A y B\n\r");
+//                printf("Corriendo Matriz A y B\n\r");
                 output_high(PIN_B3); // Activa Enable para iniciar el demux en 000.
 
                 for(aux;aux<3;aux++)
