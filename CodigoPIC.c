@@ -12,6 +12,7 @@
 #use fast_io(b)
 
 motores(int32 pasos, int dir);
+motores2(int32 pasos, int dir);
 void main()
 {
 
@@ -54,7 +55,7 @@ void main()
     int32 steps;
     int32 der_steps;
     int32 izq_steps;
-    
+
     output_low(PIN_B0);
     output_low(PIN_B1);
     output_low(PIN_B2);
@@ -194,7 +195,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 break;
 
             case '8': 
-            sensortest:
+sensortest:
                 delay_us(200);
                 status = input_state(PIN_A5);
                 if (status == 0)
@@ -209,12 +210,12 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 der_steps = 0;
                 izq_steps = 0;
                 direccion = 1; //a la derecha
-            calibra1:
+calibra1:
                 //printf("calibra1\n\r");
-                steps = 1;
+                steps = 100;
                 output_high(PIN_A4); // Activa motor 1
-                motores(steps,direccion);
-                steps = steps + 1;
+                motores2(steps,direccion);
+                steps = steps + 100;
                 status = input_state(PIN_A5);
                 //printf("calibra1: direccion ->%d<-  \n\r",direccion);
                 //printf("calibra1: status sensor ->%d<-  \n\r",status);
@@ -224,14 +225,14 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                     steps = 0;
                     goto calibraIzq;
                 }else{
-                steps = steps + 1;
-                goto calibra1;
+                    steps = steps + 100;
+                    goto calibra1;
                 };
-            calibraIzq:
+calibraIzq:
                 //printf("calibraIzq\n\r");
-                izq_steps = 1;
+                izq_steps = 100;
                 output_high(PIN_A4); // Activa motor 1
-                motores(izq_steps,direccion);
+                motores2(izq_steps,direccion);
                 status = input_state(PIN_A5);
                 //printf("calibraIzq: direccion ->%d<-  \n\r",direccion);
                 //printf("calibraIzq: status sensor->%d<-  \n\r",status);
@@ -240,14 +241,14 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                     direccion = 0; // a la izquierda
                     goto calibraDer;
                 }else{
-                    izq_steps = izq_steps + 1;
+                    izq_steps = izq_steps + 100;
                     goto calibraIzq;
                 };
-            calibraDer:
+calibraDer:
                 //printf("calibraDer\n\r");
-                der_steps = 1;
+                der_steps = 100;
                 output_high(PIN_A4); // Activa motor 1
-                motores(der_steps,direccion);
+                motores2(der_steps,direccion);
                 status = input_state(PIN_A5);
                 //printf("calibraDer: direccion ->%d<-  \n\r",direccion);
                 //printf("calibraDer: status sensor->%d<-  \n\r",status);
@@ -255,24 +256,24 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 if (status == 0){ //sensor tapado:
                     goto muevete;
                 }else{
-                    der_steps = der_steps + 1;
+                    der_steps = der_steps + 100;
                     goto calibraDer;
                 };
 
-            muevete:
+muevete:
                 //printf("Setup muevete\n\r");
-                error = 100;
+                error = 1000;
                 output_high(PIN_A4); // Activa motor 1.
                 izq_steps = izq_steps - error;
                 der_steps = der_steps - error;
                 //printf("muevete: izq_steps ->%Lu<-  \n\r",izq_steps);
                 //printf("muevete: der_steps ->%Lu<-  \n\r",der_steps);
                 goto otravez;
-            otravez:
-                motores(izq_steps,0);
-                delay_us(200);
-                motores(der_steps,1);
-                delay_us(200);
+otravez:
+                motores2(izq_steps,0);
+                delay_us(500);
+                motores2(der_steps,1);
+                delay_us(500);
                 goto otravez;
 
             case '7': // PWMs-LEDs
@@ -394,87 +395,107 @@ salir:
 
 
 }  //FIN MAIN
-
-
-
-int motores(int32 pasos, int dir)
+int motores2(int32 pasos, int dir)
 {
-    // PARÁMETROS:
-
     int32 y=0;
-    int32 y2;
-
-    // ACCIONES:
-
-
     output_low(PIN_A1);  //STEP
-
-
-
     if(dir==0)
     {
         output_low(PIN_A0);
-        printf("bajo\n\r");
     }
     if(dir==1)
     {
         output_high(PIN_A0);
-        printf("alto\n\r");
     }
-
-
-
-    //if(input_state(PIN_A5)==0)
-    //{
-    //   printf("Sensor bloqueado. No se permite giro del motor.");
-    //   goto apagamotor;  //No permite iniciar giro por estar bloqueado el sensor.
-    //}
-
-
-
-    delay_ms(400);
-
-    for (y=0;y<pasos;y++)   //Rota motor.
+    delay_ms(500);
+    for(y;y<pasos;y++)
     {
-        y2=y;
-        if(input_state(PIN_A5)==0) //Si se bloquea cualquier sensor.
-        {
-            printf("cambio giro\n\r");
-            if(dir==0)   //Si giraba hacia la izquierda,
-                {
-                    output_high(PIN_A0); //ahora gira hacia la derecha, invirtiendo sentido.
-                    goto invertir;
-                }
-            if(dir==1) // Si giraba hacia la derecha,
-                {
-                    output_low(PIN_A0); // ahora gira hacia la izquierda, invirtiendo sentido.
-                }
-invertir:
-            delay_ms(500);
-            for(y2;y2<pasos;y2++)
-            {
-                output_low(PIN_A1);
-                output_high(PIN_A1);
-                delay_us(200);
-            }
-            goto apagamotor;
-
-        }
-
         output_low(PIN_A1);
         output_high(PIN_A1);
         delay_us(200);
     }
+}
+
+
+
+    int motores(int32 pasos, int dir)
+    {
+        // PARÁMETROS:
+
+        int32 y=0;
+        int32 y2;
+
+        // ACCIONES:
+
+
+        output_low(PIN_A1);  //STEP
+
+
+
+        if(dir==0)
+        {
+            output_low(PIN_A0);
+            //        printf("bajo\n\r");
+        }
+        if(dir==1)
+        {
+            output_high(PIN_A0);
+            //        printf("alto\n\r");
+        }
+
+
+
+        //if(input_state(PIN_A5)==0)
+        //{
+        //   printf("Sensor bloqueado. No se permite giro del motor.");
+        //   goto apagamotor;  //No permite iniciar giro por estar bloqueado el sensor.
+        //}
+
+
+
+        delay_ms(400);
+
+        for (y=0;y<pasos;y++)   //Rota motor.
+        {
+            y2=y;
+            if(input_state(PIN_A5)==0) //Si se bloquea cualquier sensor.
+            {
+                //            printf("cambio giro\n\r");
+                if(dir==0)   //Si giraba hacia la izquierda,
+                    {
+                        output_high(PIN_A0); //ahora gira hacia la derecha, invirtiendo sentido.
+                        goto invertir;
+                    }
+                if(dir==1) // Si giraba hacia la derecha,
+                    {
+                        output_low(PIN_A0); // ahora gira hacia la izquierda, invirtiendo sentido.
+                    }
+invertir:
+                delay_ms(500);
+                for(y2;y2<pasos;y2++)
+                {
+                    output_low(PIN_A1);
+                    output_high(PIN_A1);
+                    delay_us(200);
+                }
+                goto apagamotor;
+
+            }
+
+            output_low(PIN_A1);
+            output_high(PIN_A1);
+            delay_us(200);
+        }
 
 apagamotor: // Label para apagar motor y cesar el giro.
 
-    output_low(PIN_A1); // STEP a cero.
-    delay_ms(100);
-    output_low(PIN_A2);  //Apaga motor.
-    output_low(PIN_A3);
-    output_low(PIN_A4);
+        output_low(PIN_A1); // STEP a cero.
+        delay_ms(100);
+        output_low(PIN_A2);  //Apaga motor.
+        output_low(PIN_A3);
+        output_low(PIN_A4);
 
-    printf("fin operacion\n\r");
+        printf("fin operacion\n\r");
 
-}
+    }
 
