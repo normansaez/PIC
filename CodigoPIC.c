@@ -14,13 +14,13 @@
 #use fast_io(a)
 #use fast_io(b)
 
+void motor_off();
 void motores(int32 pasos, int dir);
-motores2(int32 pasos, int dir);
+int motores2(int32 pasos, int dir);
 int32 motores3(int32 pasos, int dir);
+
 void main()
 {
-
-
     setup_adc_ports(NO_ANALOGS);
     setup_adc(ADC_CLOCK_DIV_2);
     setup_psp(PSP_DISABLED);
@@ -43,7 +43,6 @@ void main()
 
 
     // ************************ CONFIGURACIÓN PWM1 y PWM2: ************************
-
     int v1=50;
     int v2=50;
     int retardo=1; // Retardo por defecto de 1[ms]
@@ -53,10 +52,10 @@ void main()
     char expo[5];
     int16 exposicion=500;   //Tiempo de exposición de la cámara en [ms]
     int aux=1;
-    int1 status=1;
-    int direccion=1;
-    int32 error=0;
-    int32 steps=0;
+//    int1 status=1;
+//    int direccion=1;
+//    int32 error=0;
+//    int32 steps=0;
     int32 der_steps=0;
     int32 izq_steps=0;
 
@@ -199,14 +198,6 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 break;
 
             case '8': 
-                //sensortest:
-                //                delay_us(200);
-                //                status = input_state(PIN_A5);
-                //                if (status == 0)
-                //                    printf("sensor tapado: ->%d<-  \n\r",status);
-                //                if (status == 1)
-                //                    printf("sensor libre: ->%d<-  \n\r",status);
-                //                goto sensortest;
                 printf("Setup calibracion quick\n\r");
                 der_steps = 500;
                 izq_steps = 500;
@@ -220,78 +211,15 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 motores2(100,DERECHA);
                 delay_us(200);
                 der_steps = motores3(2147483640,IZQUIERDA);
-                goto muevete;
-
-            case '9': //motor 3 a la derecha.
-                printf("Setup calibracion\n\r");
-                steps = 500;
-                der_steps = 500;
-                izq_steps = 500;
-                direccion = 1; //a la derecha
-calibra1:
-                //printf("calibra1\n\r");
-                output_high(PIN_A4); // Activa motor 1
-                motores2(steps,direccion);
-                status = input_state(PIN_A5);
-                //printf("calibra1: direccion ->%d<-  \n\r",direccion);
-                //printf("calibra1: status sensor ->%d<-  \n\r",status);
-                //printf("calibra1: steps ->%Ld<-  \n\r",steps);
-                if (status == 0){ //sensor tapado:
-                    direccion = 0; // a la izquierda
-                    printf("calibra1: status sensor ->%d<-  \n\r",status);
-                    goto calibraIzq;
-                }else{
-                    goto calibra1;
-                };
-calibraIzq:
-                //printf("calibraIzq\n\r");
-                output_high(PIN_A4); // Activa motor 1
-                motores2(steps,direccion);
-                status = input_state(PIN_A5);
-                //printf("calibraIzq: direccion ->%d<-  \n\r",direccion);
-                //printf("calibraIzq: status sensor->%d<-  \n\r",status);
-                printf("calibraIzq: steps ->%Ld<-  \n\r",izq_steps);
-                if (status == 0){ //sensor tapado:
-                    printf("calibraIzq: status sensor ->%d<-  \n\r",status);
-                    direccion = 1; // a la der
-                    goto calibraDer;
-                }else{
-                    izq_steps = izq_steps + 500;
-                    goto calibraIzq;
-                };
-calibraDer:
-                //printf("calibraDer\n\r");
-                output_high(PIN_A4); // Activa motor 1
-                motores2(steps,direccion);
-                status = input_state(PIN_A5);
-                //printf("calibraDer: direccion ->%d<-  \n\r",direccion);
-                //printf("calibraDer: status sensor->%d<-  \n\r",status);
-                printf("calibraDer: steps ->%Ld<-  \n\r",der_steps);
-                if (status == 0){ //sensor tapado:
-                    printf("calibraDer: status sensor ->%d<-  \n\r",status);
-                    goto muevete;
-                }else{
-                    der_steps = der_steps + 500;
-                    goto calibraDer;
-                };
-
-muevete:
-                //printf("Setup muevete\n\r");
-                error = 0;
-                output_high(PIN_A4); // Activa motor 1.
-                printf("sin restar error: izq_steps ->%Ld<-  \n\r",izq_steps);
-                printf("sin restar error: der_steps ->%Ld<-  \n\r",der_steps);
-                izq_steps = abs(izq_steps - error);
-                der_steps = abs(der_steps - error);
-                printf("abs(izq_steps - error) = ->%Ld<-  \n\r",izq_steps);
-                printf("abs(der_steps - error) = ->%Ld<-  \n\r",der_steps);
-                goto otravez;
-otravez:
+                printf("izq_steps ->%Ld<-  \n\r",izq_steps);
+                printf("der_steps ->%Ld<-  \n\r",der_steps);
+                goto loopInfinito;
+loopInfinito:
                 motores2(izq_steps,IZQUIERDA);
                 delay_us(200);
                 motores2(der_steps,DERECHA);
                 delay_us(200);
-                goto otravez;
+                goto loopInfinito;
 
             case '7': // PWMs-LEDs
 
@@ -410,8 +338,15 @@ salir:
 
 
 
-
 }  //FIN MAIN
+void motor_off(){
+    output_low(PIN_A1); 
+    delay_ms(100);
+    output_low(PIN_A2);
+    output_low(PIN_A3);
+    output_low(PIN_A4);
+}
+
 int32 motores3(int32 pasos, int dir)
 {
     int32 y=0;
@@ -533,15 +468,12 @@ invertir:
         delay_us(200);
     }
 
-apagamotor: // Label para apagar motor y cesar el giro.
+apagamotor:
 
-    output_low(PIN_A1); // STEP a cero.
+    output_low(PIN_A1); 
     delay_ms(100);
-    output_low(PIN_A2);  //Apaga motor.
+    output_low(PIN_A2);
     output_low(PIN_A3);
     output_low(PIN_A4);
-
-    //        printf("fin operacion\n\r");
-
 }
 
