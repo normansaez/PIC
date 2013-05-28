@@ -210,7 +210,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 delay_us(200);
                 motores2(100,DERECHA);
                 delay_us(200);
-                der_steps = motores3(2147483640,IZQUIERDA);
+                der_steps = motores3(2147483640,DERECHA);
                 printf("izq_steps ->%Ld<-  \n\r",izq_steps);
                 printf("der_steps ->%Ld<-  \n\r",der_steps);
                 goto loopInfinito;
