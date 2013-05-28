@@ -2,6 +2,9 @@
 #include <stdio.h>  // Permite usar librería de ATOI (convierte string a entero)
 #include <stdlib.h> // idem requerido.
 
+#define DERECHA 1
+#define IZQUIERDA 0
+
 #fuses HS,NOWDT,NOPROTECT,NOLVP,PUT,NODEBUG,NOBROWNOUT,NOCPD,NOWRT 
 #use delay (clock=20000000)   //Frecuencia de cristal de 20MHz.
 
@@ -11,7 +14,7 @@
 #use fast_io(a)
 #use fast_io(b)
 
-motores(int32 pasos, int dir);
+void motores(int32 pasos, int dir);
 motores2(int32 pasos, int dir);
 int32 motores3(int32 pasos, int dir);
 void main()
@@ -110,7 +113,7 @@ inicia1: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) y pulse ENTER:\n\r");
                 fgets(ciclo);
                 v1=atoi(ciclo);
-                if(v1>100 || v1<0)
+                if(v1>100 || v1<=0)
                 {
                     printf("Ingrese un número entero valido\n\r");
                     goto inicia1;
@@ -128,7 +131,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 fgets(ciclo2);
                 v2=atoi(ciclo2);
 
-                if(v2>100 || v2<0)
+                if(v2>100 || v2<=0)
                 {
                     printf("Ingrese un número entero valido\n\r");
                     goto inicia2;
@@ -146,7 +149,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 pasos1=atoi32(darpasos);
                 printf("caso 1 izquierda");
                 output_high(PIN_A2); // Activa motor 1.  
-                motores(pasos1,0);
+                motores(pasos1,IZQUIERDA);
                 break;
 
             case '2': //motor 1 a la derecha.
@@ -155,7 +158,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 pasos1=atoi32(darpasos);
                 printf("caso 2 derecha");
                 output_high(PIN_A2); // Activa motor 1.
-                motores(pasos1,1);
+                motores(pasos1,DERECHA);
                 break;
 
             case '3': //motor 2 a la izquierda.
@@ -164,7 +167,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 pasos1=atoi32(darpasos);
                 printf("caso 3 izquierda");
                 output_high(PIN_A3); // Activa motor 1.  
-                motores(pasos1,0);
+                motores(pasos1,IZQUIERDA);
                 break;
 
             case '4': //motor 2 a la derecha.
@@ -173,7 +176,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 pasos1=atoi32(darpasos);
                 printf("caso 4 derecha");
                 output_high(PIN_A3); // Activa motor 1.
-                motores(pasos1,1);
+                motores(pasos1,DERECHA);
                 break;
 
             case '5': //motor 3 a la izquierda.
@@ -182,7 +185,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 pasos1=atoi32(darpasos);
                 printf("caso 5 izquierda");
                 output_high(PIN_A4); // Activa motor 1.  
-                motores(pasos1,0);
+                motores(pasos1,IZQUIERDA);
                 break;
 
             case '6': //motor 3 a la derecha.
@@ -191,7 +194,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 pasos1=atoi32(darpasos);
                 printf("caso 6 derecha");
                 output_high(PIN_A4); // Activa motor 1.
-                motores(pasos1,1);
+                motores(pasos1,DERECHA);
 
                 break;
 
@@ -208,15 +211,15 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 der_steps = 500;
                 izq_steps = 500;
                 output_high(PIN_A4); 
-                motores3(2147483640,1);
+                motores3(2147483640,DERECHA);
                 delay_us(200);
-                motores2(100,0);
+                motores2(100,IZQUIERDA);
                 delay_us(200);
-                izq_steps = motores3(2147483640,0);
+                izq_steps = motores3(2147483640,IZQUIERDA);
                 delay_us(200);
-                motores2(100,1);
+                motores2(100,DERECHA);
                 delay_us(200);
-                der_steps = motores3(2147483640,1);
+                der_steps = motores3(2147483640,IZQUIERDA);
                 goto muevete;
 
             case '9': //motor 3 a la derecha.
@@ -284,9 +287,9 @@ muevete:
                 printf("abs(der_steps - error) = ->%Ld<-  \n\r",der_steps);
                 goto otravez;
 otravez:
-                motores2(izq_steps,0);
+                motores2(izq_steps,IZQUIERDA);
                 delay_us(200);
-                motores2(der_steps,1);
+                motores2(der_steps,DERECHA);
                 delay_us(200);
                 goto otravez;
 
@@ -305,7 +308,7 @@ otravez:
                 //                printf("Corriendo Matriz A y B\n\r");
                 output_high(PIN_B3); // Activa Enable para iniciar el demux en 000.
 
-                for(aux;aux<3;aux++)
+                for(aux=0;aux<3;aux++)
                 {
 
                     //                    printf("for");
@@ -423,7 +426,7 @@ int32 motores3(int32 pasos, int dir)
         output_high(PIN_A0);
     }
     delay_ms(100);
-    for(y;y<pasos;y++)
+    for(y=0;y<pasos;y++)
     {
         output_low(PIN_A1);
         output_high(PIN_A1);
@@ -450,7 +453,7 @@ int motores2(int32 pasos, int dir)
         output_high(PIN_A0);
     }
     delay_ms(100);
-    for(y;y<pasos;y++)
+    for(y=0;y<pasos;y++)
     {
         output_low(PIN_A1);
         output_high(PIN_A1);
@@ -461,7 +464,7 @@ int motores2(int32 pasos, int dir)
 
 
 
-int motores(int32 pasos, int dir)
+void motores(int32 pasos, int dir)
 {
     // PARÁMETROS:
 
@@ -515,7 +518,7 @@ int motores(int32 pasos, int dir)
                 }
 invertir:
             delay_ms(500);
-            for(y2;y2<pasos;y2++)
+            for(y2=0;y2<pasos;y2++)
             {
                 output_low(PIN_A1);
                 output_high(PIN_A1);
