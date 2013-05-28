@@ -394,39 +394,17 @@ int motores2(int32 pasos, int dir)
 
 void motores(int32 pasos, int dir)
 {
-    // PARÁMETROS:
-
     int32 y=0;
     int32 y2;
-
-    // ACCIONES:
-
-
     output_low(PIN_A1);  //STEP
-
-
-
     if(dir==0)
     {
         output_low(PIN_A0);
-        //        printf("bajo\n\r");
     }
     if(dir==1)
     {
         output_high(PIN_A0);
-        //        printf("alto\n\r");
     }
-
-
-
-    //if(input_state(PIN_A5)==0)
-    //{
-    //   printf("Sensor bloqueado. No se permite giro del motor.");
-    //   goto apagamotor;  //No permite iniciar giro por estar bloqueado el sensor.
-    //}
-
-
-
     delay_ms(400);
 
     for (y=0;y<pasos;y++)   //Rota motor.
@@ -434,7 +412,6 @@ void motores(int32 pasos, int dir)
         y2=y;
         if(input_state(PIN_A5)==0) //Si se bloquea cualquier sensor.
         {
-            //            printf("cambio giro\n\r");
             if(dir==0)   //Si giraba hacia la izquierda,
                 {
                     output_high(PIN_A0); //ahora gira hacia la derecha, invirtiendo sentido.
@@ -468,8 +445,5 @@ apagamotor: // Label para apagar motor y cesar el giro.
     output_low(PIN_A2);  //Apaga motor.
     output_low(PIN_A3);
     output_low(PIN_A4);
-
-    //        printf("fin operacion\n\r");
-
 }
 
