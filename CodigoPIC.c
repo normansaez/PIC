@@ -3,6 +3,9 @@
 #include <stdlib.h> // idem requerido.
 #include <limits.h>
 
+#define DERECHA 1
+#define IZQUIERDA 0
+
 #fuses HS,NOWDT,NOPROTECT,NOLVP,PUT,NODEBUG,NOBROWNOUT,NOCPD,NOWRT 
 #use delay (clock=20000000)   //Frecuencia de cristal de 20MHz.
 
@@ -76,30 +79,23 @@ void main()
 
     while(true)
     {
-
         char seleccionar=0;
         output_low(PIN_A2);
         output_low(PIN_A3);
         output_low(PIN_A4);
 
-
         printf("Seleccione a, b, e, 1, 2, 3, 4, 5, 6 , 7. 8 =test, 9= cal\n\r");
         seleccionar=getc();
-
-
-
         switch(seleccionar)
         {
 
             case 'e': // define tiempo de exposición.
-
                 printf("Ingrese tiempo de exposicion en [ms] y pulse ENTER:\n\r");
                 fgets(expo);
                 exposicion=atoi32(expo);
                 printf("Exposicion en [ms]: ");
                 printf("%Ld \n\r",exposicion);
                 break;
-
             case 'a': // Define Ciclo PWM1.
 
 inicia1: //Label usado para redirigir el programa ante error en ingreso de Ciclo.
@@ -143,7 +139,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 pasos1=atoi32(darpasos);
                 printf("caso 1 izquierda");
                 output_high(PIN_A2); // Activa motor 1.  
-                motores(pasos1,0);
+                motores(pasos1,IZQUIERDA);
                 break;
 
             case '2': //motor 1 a la derecha.
@@ -152,7 +148,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 pasos1=atoi32(darpasos);
                 printf("caso 2 derecha");
                 output_high(PIN_A2); // Activa motor 1.
-                motores(pasos1,1);
+                motores(pasos1,DERECHA);
                 break;
 
             case '3': //motor 2 a la izquierda.
@@ -161,7 +157,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 pasos1=atoi32(darpasos);
                 printf("caso 3 izquierda");
                 output_high(PIN_A3); // Activa motor 1.  
-                motores(pasos1,0);
+                motores(pasos1,IZQUIERDA);
                 break;
 
             case '4': //motor 2 a la derecha.
@@ -170,7 +166,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 pasos1=atoi32(darpasos);
                 printf("caso 4 derecha");
                 output_high(PIN_A3); // Activa motor 1.
-                motores(pasos1,1);
+                motores(pasos1,DERECHA);
                 break;
 
             case '5': //motor 3 a la izquierda.
@@ -179,7 +175,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 pasos1=atoi32(darpasos);
                 printf("caso 5 izquierda");
                 output_high(PIN_A4); // Activa motor 1.  
-                motores(pasos1,0);
+                motores(pasos1,IZQUIERDA);
                 break;
 
             case '6': //motor 3 a la derecha.
@@ -188,24 +184,22 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 pasos1=atoi32(darpasos);
                 printf("caso 6 derecha");
                 output_high(PIN_A4); // Activa motor 1.
-                motores(pasos1,1);
+                motores(pasos1,DERECHA);
 
                 break;
 
             case '8': 
                 printf("Setup calibracion quick\n\r");
-                der_steps = 500;
-                izq_steps = 500;
                 output_high(PIN_A4); 
-                motores3(INT_MAX,1);
+                motores3(INT_MAX,DERECHA);
                 delay_us(200);
-                motores2(100,0);
+                motores2(100,IZQUIERDA);
                 delay_us(200);
-                izq_steps = motores3(INT_MAX,0);
+                izq_steps = motores3(INT_MAX,IZQUIERDA);
                 delay_us(200);
-                motores2(100,1);
+                motores2(100,DERECHA);
                 delay_us(200);
-                der_steps = motores3(INT_MAX,1);
+                der_steps = motores3(INT_MAX,DERECHA);
                 goto muevete;
 
             case '9': 
@@ -215,9 +209,9 @@ muevete:
                 printf("loop: der_steps ->%Ld<-  \n\r",der_steps);
                 goto otravez;
 otravez:
-                motores2(izq_steps,0);
+                motores2(izq_steps,IZQUIERDA);
                 delay_us(200);
-                motores2(der_steps,1);
+                motores2(der_steps,DERECHA);
                 delay_us(200);
                 goto otravez;
 
@@ -345,14 +339,7 @@ int32 motores3(int32 pasos, int dir)
     int32 y=0;
     int1 status=1;
     output_low(PIN_A1);  //STEP
-    if(dir==0)
-    {
-        output_low(PIN_A0);
-    }
-    if(dir==1)
-    {
-        output_high(PIN_A0);
-    }
+    dir?output_high(PIN_A0):output_low(PIN_A0);
     delay_ms(100);
     for(y=0;y<pasos;y++)
     {
@@ -360,7 +347,7 @@ int32 motores3(int32 pasos, int dir)
         output_high(PIN_A1);
         status = input_state(PIN_A5);
         if (status == 0){
-            printf("status sensor ->%d<-  \n\r",status);
+            printf("status sensor ->%d<- => tapado  \n\r",status);
             return y;
         }
         delay_us(200);
@@ -372,14 +359,7 @@ int motores2(int32 pasos, int dir)
 {
     int32 y=0;
     output_low(PIN_A1);  //STEP
-    if(dir==0)
-    {
-        output_low(PIN_A0);
-    }
-    if(dir==1)
-    {
-        output_high(PIN_A0);
-    }
+    dir?output_high(PIN_A0):output_low(PIN_A0);
     delay_ms(100);
     for(y=0;y<pasos;y++)
     {
