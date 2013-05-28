@@ -196,14 +196,14 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 break;
 
             case '8': 
-//sensortest:
-//                delay_us(200);
-//                status = input_state(PIN_A5);
-//                if (status == 0)
-//                    printf("sensor tapado: ->%d<-  \n\r",status);
-//                if (status == 1)
-//                    printf("sensor libre: ->%d<-  \n\r",status);
-//                goto sensortest;
+                //sensortest:
+                //                delay_us(200);
+                //                status = input_state(PIN_A5);
+                //                if (status == 0)
+                //                    printf("sensor tapado: ->%d<-  \n\r",status);
+                //                if (status == 1)
+                //                    printf("sensor libre: ->%d<-  \n\r",status);
+                //                goto sensortest;
                 printf("Setup calibracion quick\n\r");
                 der_steps = 500;
                 izq_steps = 500;
@@ -302,22 +302,22 @@ otravez:
                 output_low(PIN_B4);
                 output_low(PIN_B5);
                 delay_ms(100);    //delay de 100ms para luego iniciar secuencia de control del DEMUX
-//                printf("Corriendo Matriz A y B\n\r");
+                //                printf("Corriendo Matriz A y B\n\r");
                 output_high(PIN_B3); // Activa Enable para iniciar el demux en 000.
 
                 for(aux=0;aux<3;aux++)
                 {
 
-//                    printf("for");
+                    //                    printf("for");
                     delay_ms(retardo);   // Delay para tener LED encendido y luego iniciar trigger CCD.
-//                    printf("pasa retardo");
+                    //                    printf("pasa retardo");
                     output_high(PIN_B5); //Activa trigger CCD.
                     delay_ms(t_on);
                     output_low(PIN_B5);  //Desactiva trigger CCD.
-//                    printf("antes de morir");
+                    //                    printf("antes de morir");
                     delay_ms(exposicion+retardo-t_on); // Mantiene control en LLL=> Salida Y0=1 (High) y el resto 0 (Low).
 
-//                    printf("for1");
+                    //                    printf("for1");
                     output_high(PIN_B0);
                     delay_ms(retardo);
                     output_high(PIN_B5); //Activa trigger CCD.
@@ -325,7 +325,7 @@ otravez:
                     output_low(PIN_B5);
                     delay_ms(exposicion+retardo-t_on);
                     output_low(PIN_B0);
-//                    printf("for2");
+                    //                    printf("for2");
                     output_high(PIN_B1);
                     delay_ms(retardo);
                     output_high(PIN_B5); //Activa trigger CCD.
@@ -333,7 +333,7 @@ otravez:
                     output_low(PIN_B5);
                     delay_ms(exposicion+retardo-t_on);
 
-//                    printf("for3");
+                    //                    printf("for3");
                     output_high(PIN_B0);
                     delay_ms(retardo);
                     output_high(PIN_B5); //Activa trigger CCD.
@@ -341,7 +341,7 @@ otravez:
                     output_low(PIN_B5);
                     delay_ms(exposicion+retardo-t_on);
 
-//                    printf("for4");
+                    //                    printf("for4");
                     output_low(PIN_B0);
                     output_low(PIN_B1);
                     output_high(PIN_B2);
@@ -351,7 +351,7 @@ otravez:
                     output_low(PIN_B5);
                     delay_ms(exposicion+retardo-t_on);
 
-//                    printf("for5");
+                    //                    printf("for5");
                     output_high(PIN_B0);
                     delay_ms(retardo);
                     output_high(PIN_B5); //Activa trigger CCD.
@@ -359,7 +359,7 @@ otravez:
                     output_low(PIN_B5);
                     delay_ms(exposicion+retardo-t_on);
 
-//                    printf("for6");
+                    //                    printf("for6");
                     output_low(PIN_B0);
                     output_high(PIN_B1);
                     delay_ms(retardo);
@@ -368,7 +368,7 @@ otravez:
                     output_low(PIN_B5);
                     delay_ms(exposicion+retardo-t_on);
 
-//                    printf("for7");
+                    //                    printf("for7");
                     output_high(PIN_B0);
                     delay_ms(retardo);
                     output_high(PIN_B5); //Activa trigger CCD.
@@ -376,22 +376,22 @@ otravez:
                     output_low(PIN_B5);
                     delay_ms(exposicion+retardo-t_on);
 
-//                    printf("for setea a cero\n\r");
+                    //                    printf("for setea a cero\n\r");
                     output_low(PIN_B0);  //Setea a 0 los pines para dejarlos como al inicio.
                     output_low(PIN_B1);
                     output_low(PIN_B2);
                     output_low(PIN_B3);
                     output_low(PIN_B4);
 
-//                    printf("Ha operado una matriz");
-//                    printf("\n\r");
+                    //                    printf("Ha operado una matriz");
+                    //                    printf("\n\r");
                     if(aux==2)
                     {
                         goto salir;
                     }
 
                     output_high(PIN_B4); // Activa Enable Matriz Bpara iniciar el demux en 000.
-//                    printf("un B4 high\n\r");
+                    //                    printf("un B4 high\n\r");
                 }
 salir:
                 output_low(PIN_B3);
@@ -461,84 +461,84 @@ int motores2(int32 pasos, int dir)
 
 
 
-    void motores(int32 pasos, int dir)
+void motores(int32 pasos, int dir)
+{
+    // PARÁMETROS:
+
+    int32 y=0;
+    int32 y2;
+
+    // ACCIONES:
+
+
+    output_low(PIN_A1);  //STEP
+
+
+
+    if(dir==0)
     {
-        // PARÁMETROS:
-
-        int32 y=0;
-        int32 y2;
-
-        // ACCIONES:
-
-
-        output_low(PIN_A1);  //STEP
-
+        output_low(PIN_A0);
+        //        printf("bajo\n\r");
+    }
+    if(dir==1)
+    {
+        output_high(PIN_A0);
+        //        printf("alto\n\r");
+    }
 
 
-        if(dir==0)
+
+    //if(input_state(PIN_A5)==0)
+    //{
+    //   printf("Sensor bloqueado. No se permite giro del motor.");
+    //   goto apagamotor;  //No permite iniciar giro por estar bloqueado el sensor.
+    //}
+
+
+
+    delay_ms(400);
+
+    for (y=0;y<pasos;y++)   //Rota motor.
+    {
+        y2=y;
+        if(input_state(PIN_A5)==0) //Si se bloquea cualquier sensor.
         {
-            output_low(PIN_A0);
-            //        printf("bajo\n\r");
-        }
-        if(dir==1)
-        {
-            output_high(PIN_A0);
-            //        printf("alto\n\r");
-        }
-
-
-
-        //if(input_state(PIN_A5)==0)
-        //{
-        //   printf("Sensor bloqueado. No se permite giro del motor.");
-        //   goto apagamotor;  //No permite iniciar giro por estar bloqueado el sensor.
-        //}
-
-
-
-        delay_ms(400);
-
-        for (y=0;y<pasos;y++)   //Rota motor.
-        {
-            y2=y;
-            if(input_state(PIN_A5)==0) //Si se bloquea cualquier sensor.
-            {
-                //            printf("cambio giro\n\r");
-                if(dir==0)   //Si giraba hacia la izquierda,
-                    {
-                        output_high(PIN_A0); //ahora gira hacia la derecha, invirtiendo sentido.
-                        goto invertir;
-                    }
-                if(dir==1) // Si giraba hacia la derecha,
-                    {
-                        output_low(PIN_A0); // ahora gira hacia la izquierda, invirtiendo sentido.
-                    }
-invertir:
-                delay_ms(500);
-                for(y2=0;y2<pasos;y2++)
+            //            printf("cambio giro\n\r");
+            if(dir==0)   //Si giraba hacia la izquierda,
                 {
-                    output_low(PIN_A1);
-                    output_high(PIN_A1);
-                    delay_us(200);
+                    output_high(PIN_A0); //ahora gira hacia la derecha, invirtiendo sentido.
+                    goto invertir;
                 }
-                goto apagamotor;
-
+            if(dir==1) // Si giraba hacia la derecha,
+                {
+                    output_low(PIN_A0); // ahora gira hacia la izquierda, invirtiendo sentido.
+                }
+invertir:
+            delay_ms(500);
+            for(y2=0;y2<pasos;y2++)
+            {
+                output_low(PIN_A1);
+                output_high(PIN_A1);
+                delay_us(200);
             }
+            goto apagamotor;
 
-            output_low(PIN_A1);
-            output_high(PIN_A1);
-            delay_us(200);
         }
+
+        output_low(PIN_A1);
+        output_high(PIN_A1);
+        delay_us(200);
+    }
 
 apagamotor: // Label para apagar motor y cesar el giro.
 
-        output_low(PIN_A1); // STEP a cero.
-        delay_ms(100);
-        output_low(PIN_A2);  //Apaga motor.
-        output_low(PIN_A3);
-        output_low(PIN_A4);
+    output_low(PIN_A1); // STEP a cero.
+    delay_ms(100);
+    output_low(PIN_A2);  //Apaga motor.
+    output_low(PIN_A3);
+    output_low(PIN_A4);
 
-//        printf("fin operacion\n\r");
+    //        printf("fin operacion\n\r");
 
-    }
+}
 
