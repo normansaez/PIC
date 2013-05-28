@@ -11,8 +11,8 @@
 #use fast_io(a)
 #use fast_io(b)
 
-motores(int32 pasos, int dir);
-motores2(int32 pasos, int dir);
+void motores(int32 pasos, int dir);
+int motores2(int32 pasos, int dir);
 int32 motores3(int32 pasos, int dir);
 void main()
 {
@@ -110,7 +110,7 @@ inicia1: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) y pulse ENTER:\n\r");
                 fgets(ciclo);
                 v1=atoi(ciclo);
-                if(v1>100 || v1<0)
+                if(v1>100 || v1<=0)
                 {
                     printf("Ingrese un número entero valido\n\r");
                     goto inicia1;
@@ -128,7 +128,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 fgets(ciclo2);
                 v2=atoi(ciclo2);
 
-                if(v2>100 || v2<0)
+                if(v2>100 || v2<=0)
                 {
                     printf("Ingrese un número entero valido\n\r");
                     goto inicia2;
@@ -305,7 +305,7 @@ otravez:
 //                printf("Corriendo Matriz A y B\n\r");
                 output_high(PIN_B3); // Activa Enable para iniciar el demux en 000.
 
-                for(aux;aux<3;aux++)
+                for(aux=0;aux<3;aux++)
                 {
 
 //                    printf("for");
@@ -423,7 +423,7 @@ int32 motores3(int32 pasos, int dir)
         output_high(PIN_A0);
     }
     delay_ms(100);
-    for(y;y<pasos;y++)
+    for(y=0;y<pasos;y++)
     {
         output_low(PIN_A1);
         output_high(PIN_A1);
@@ -450,7 +450,7 @@ int motores2(int32 pasos, int dir)
         output_high(PIN_A0);
     }
     delay_ms(100);
-    for(y;y<pasos;y++)
+    for(y=0;y<pasos;y++)
     {
         output_low(PIN_A1);
         output_high(PIN_A1);
@@ -461,7 +461,7 @@ int motores2(int32 pasos, int dir)
 
 
 
-    int motores(int32 pasos, int dir)
+    void motores(int32 pasos, int dir)
     {
         // PARÁMETROS:
 
@@ -515,7 +515,7 @@ int motores2(int32 pasos, int dir)
                     }
 invertir:
                 delay_ms(500);
-                for(y2;y2<pasos;y2++)
+                for(y2=0;y2<pasos;y2++)
                 {
                     output_low(PIN_A1);
                     output_high(PIN_A1);
