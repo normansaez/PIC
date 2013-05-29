@@ -134,28 +134,27 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 break;
 
             case 'l':
-                char led_string[5];
-                char timeon_string[5];
                 int32 led=0;
                 int32 timeon=0;
 
                 printf("Ingrese Led a encender: 0 a 7 y [ENTER]\n\r");
-                fgets(led_string);
-                led=atoi32(led_string);
+                fgets(darpasos);
+                led=atoi32(darpasos);
                 set_pwm1_duty(50*20000000/(100*2000*16));
                 set_pwm2_duty(50*20000000/(100*2000*16));
 
                 printf("Ingrese tiempo de exposicion en [ms] y [ENTER]\n\r");
-                fgets(timeon_string);
-                timeon=atoi32(timeon_string);
+                fgets(darpasos);
+                timeon=atoi32(darpasos);
 
+                printf("Led: %Ld , timeon: %Ld\n\r",led,timeon);
                 led_control(led,timeon);
                 break;
 
             case 'm':
                 char motor_string[5];
-                int32 motor=0;
-                int dir=0;
+                int32 motor=3;
+                int32 dir=0;
 
                 printf("Ingrese pasos a dar y [ENTER]\n\r");
                 fgets(darpasos);
@@ -164,12 +163,11 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 printf("Ingrese direccion: 0 o 1 donde 1=DERECHA, 0=IZQUIERDA y [ENTER]\n\r");
                 fgets(darpasos);
                 direccion=atoi32(darpasos);
-                dir = direccion?DERECHA:IZQUIERDA;
 
                 printf("Ingrese el numero de motor a utlizar: 1,2 o 3 y [ENTER]\n\r");
-                fgets(motor_string);
-                motor = atoi32(motor_string);               
-                printf("Motor: %Ld , Direccion: %d, pasos %Ld\n\r",motor,dir,pasos1);
+                fgets(darpasos);
+                motor = atoi32(darpasos);               
+                printf("Motor: %Ld , Direccion: %Ld, pasos %Ld\n\r",motor,dir,pasos1);
 
                 switch(motor)
                 {
