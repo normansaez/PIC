@@ -134,33 +134,33 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 break;
 
             case 'l':
-                printf("Led a encender: 0 a 7\n\r");
+                printf("Ingrese Led a encender: 0 a 7 y [ENTER]\n\r");
                 char led_string;
                 char timeon_string[5];
                 int32 led=0;
                 int32 timeon=0;
-                led_string=getc();
+                fgets(led_string);
                 led=atoi32(led_string);
                 set_pwm1_duty(50*20000000/(100*2000*16));
                 set_pwm2_duty(50*20000000/(100*2000*16));
-                printf("Ingrese tiempo de exposicion en [ms]:\n\r");
-                timeon_string=getc();
+                printf("Ingrese tiempo de exposicion en [ms] y [ENTER]\n\r");
+                fgets(timeon_string)
                 timeon=atoi32(timeon_string);
                 led_control(led,timeon);
                 break;
 
             case 'm':
-                printf("Ingrese pasos a dar:\n\r");
+                printf("Ingrese pasos a dar y [ENTER]\n\r");
                 fgets(darpasos);
                 pasos1=atoi32(darpasos);
-                printf("Ingrese direccion: 0 o 1 donde 1=DERECHA, 0=IZQUIERDA:\n\r");
+                printf("Ingrese direccion: 0 o 1 donde 1=DERECHA, 0=IZQUIERDA y [ENTER]\n\r");
                 fgets(darpasos);
                 direccion=atoi32(darpasos);
                 int dir=0;
                 dir = direccion?DERECHA:IZQUIERDA;
-                printf("Ingrese el numero de motor a utlizar: 1,2 o 3\n\r");
+                printf("Ingrese el numero de motor a utlizar: 1,2 o 3 y [ENTER]\n\r");
                 char motor;
-                motor=getc();
+                fgets(motor);
                 printf("Motor: %c , Direccion: %d, pasos %Ld\n\r",motor,dir,pasos1);
                 switch(motor)
                 {
