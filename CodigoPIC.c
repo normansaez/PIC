@@ -50,12 +50,17 @@ void main()
     int retardo=1; // Retardo por defecto de 1[ms]
     int t_on=100;  //Tiempo en [ms] que se mantiene encendido el trigger CCD (0 si se desea on-off instantáneo)
     char ciclo[3];
-    char ciclo2[3];
     char expo[5];
     int16 exposicion=500;   //Tiempo de exposición de la cámara en [ms]
     int aux=1;
     int32 der_steps=0;
     int32 izq_steps=0;
+    int32 led=0;
+    int32 motor=0;
+    int32 direccion=0;
+    int32 pasos;
+    int32 velocidad;
+    char leido_pantalla[5];
 
     output_low(PIN_B0);
     output_low(PIN_B1);
@@ -69,9 +74,6 @@ void main()
 
     //*************** INICIO ***************
 
-    int32 pasos1;
-    int32 direccion=1;
-    char darpasos[5];
 
 
     while(true)
@@ -83,167 +85,83 @@ void main()
         output_low(PIN_A4);
 
 
-        printf("Seleccione a, b, e, 1, 2, 3, 4, 5, 6 , 7\n\r");
-        printf("           l=led, m=motores, 8=loop, 9= velocidad\n\r");
+        printf("Set parameters: e=exposicion, v=velocidad");
+        printf("                 b=brillo, d=direccion, p=pasos\n\r");
+        printf("                l=led, m=motores, 8=loop\n\r");
         seleccionar=getc();
 
         switch(seleccionar)
         {
 
-            case 'e': // define tiempo de exposición.
-
-                //printf("Ingrese tiempo de exposicion en [ms] y pulse ENTER:\n\r");
-                fgets(expo);
-                exposicion=atoi32(expo);
-                //printf("Exposicion en [ms]: ");
-                //printf("%Ld \n\r",exposicion);
+            case 'v':
+                printf("Ingrese Velocidad en ms y pulse [ENTER]\n\r");
+                fgets(leido_pantalla);
+                velocidad=atoi32(leido_pantalla);
+                printf("Exposicion en [ms]: %Ld \n\r",exposicion);
                 break;
 
-            case 'a': // Define Ciclo PWM1.
-
-inicia1: //Label usado para redirigir el programa ante error en ingreso de Ciclo.
-
-                //printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) y pulse ENTER:\n\r");
-                fgets(ciclo);
-                v1=atoi(ciclo);
-                if(v1>100 || v1<=0)
-                {
-                    //printf("Ingrese un número entero valido\n\r");
-                    goto inicia1;
-                }
-                set_pwm1_duty(v1*20000000/(100*2000*16));
-                //printf("Ciclo de Trabajo PWM1 es; %d\n\r",v1);
+            case 'e': 
+                printf("Ingrese tiempo de exposicion en [ms] y pulse [ENTER]\n\r");
+                fgets(expo);
+                exposicion=atoi32(expo);
+                printf("Exposicion en [ms]: %Ld \n\r",exposicion);
                 break;
 
             case 'b':
-
-inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo.
-
-                //printf("Ingrese Ciclo de Trabajo para PWM2 (0-100) y pulse ENTER:\n\r");
-                fgets(ciclo2);
-                v2=atoi(ciclo2);
-
-                if(v2>100 || v2<=0)
-                {
-                    //printf("Ingrese un número entero valido\n\r");
-                    goto inicia2;
-                }
-
-                set_pwm2_duty(v2*20000000/(100*2000*16));
-                //printf("Ciclo de Trabajo PWM2 es; %d\n\r",v2);
+inicia1:
+                printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) y pulse (brillo) [ENTER]:\n\r");
+                fgets(ciclo);
+                v1=atoi(ciclo);
+                if(v1>100 || v1<=0)
+                    goto inicia1;
+                set_pwm1_duty(v1*20000000/(100*2000*16));
+                set_pwm2_duty(v1*20000000/(100*2000*16));
                 break;
 
             case 'l':
-                int32 led=0;
-                int32 timeon=0;
-
                 printf("Ingrese Led a encender: 0 a 7 y [ENTER]\n\r");
-                fgets(darpasos);
-                led=atoi32(darpasos);
-                set_pwm1_duty(50*20000000/(100*2000*16));
-                set_pwm2_duty(50*20000000/(100*2000*16));
-
-                printf("Ingrese tiempo de exposicion en [ms] y [ENTER]\n\r");
-                fgets(darpasos);
-                timeon=atoi32(darpasos);
-
-                printf("Led: %Ld , timeon: %Ld\n\r",led,timeon);
-                led_control(led,timeon);
+                fgets(leido_pantalla);
+                led=atoi32(leido_pantalla);
                 break;
+
+            case 'd':
+                printf("Ingrese direccion 1=Derecha, 0=Izquierda y [ENTER]\n\r");
+                fgets(leido_pantalla);
+                direccion = atoi32(leido_pantalla);               
+                printf("Direccion: %Ld\n\r",direccion);
+
+            case 'p':
+                printf("Ingrese el numero de pasos a utlizar y [ENTER]\n\r");
+                fgets(leido_pantalla);
+                pasos = atoi32(leido_pantalla);               
+                printf("Pasos: %Ld\n\r",pasos);
 
             case 'm':
-                char motor_string[5];
-                int32 motor=3;
-                int32 dir=0;
-
-                printf("Ingrese pasos a dar y [ENTER]\n\r");
-                fgets(darpasos);
-                pasos1=atoi32(darpasos);
-
-                printf("Ingrese direccion: 0 o 1 donde 1=DERECHA, 0=IZQUIERDA y [ENTER]\n\r");
-                fgets(darpasos);
-                direccion=atoi32(darpasos);
-
                 printf("Ingrese el numero de motor a utlizar: 1,2 o 3 y [ENTER]\n\r");
-                fgets(darpasos);
-                motor = atoi32(darpasos);               
-                printf("Motor: %Ld , Direccion: %Ld, pasos %Ld\n\r",motor,dir,pasos1);
+                fgets(leido_pantalla);
+                motor = atoi32(leido_pantalla);               
+                printf("Motor: %Ld\n\r",motor);
 
-                switch(motor)
-                {
-                    case 1:
-                        output_high(PIN_A2); 
-                        motores(pasos1,dir);
-                        break;
-                    case 2:
-                        output_high(PIN_A3);
-                        motores(pasos1,dir);
-                        break;
-                    case 3:
-                        output_high(PIN_A4);
-                        motores(pasos1,dir);
-                        break;
-                    default:
-                        printf("Motor invalido, use 1 o 2 o 3\n\r");
-                        break;
-                }
+                //output_high(PIN_A2); 
+                //motores(pasos,dir);
                 break;
 
 
-            case '1': //motor 1 a la izquierda.
-                //printf("Ingrese pasos\n\r");
-                fgets(darpasos);
-                pasos1=atoi32(darpasos);
-                //printf("caso 1 izquierda");
-                output_high(PIN_A2); // Activa motor 1.  
-                motores(pasos1,IZQUIERDA);
+            case '1':
+                output_high(PIN_A2);
+                motores2(pasos,direccion);
                 break;
 
-            case '2': //motor 1 a la derecha.
-                //printf("Ingrese pasos\n\r");
-                fgets(darpasos);
-                pasos1=atoi32(darpasos);
-                //printf("caso 2 derecha");
-                output_high(PIN_A2); // Activa motor 1.
-                motores(pasos1,DERECHA);
+            case '2':
+                output_high(PIN_A3);
+                motores2(pasos,direccion);
                 break;
 
-            case '3': //motor 2 a la izquierda.
-                //printf("Ingrese pasos\n\r");
-                fgets(darpasos);
-                pasos1=atoi32(darpasos);
-                //printf("caso 3 izquierda");
-                output_high(PIN_A3); // Activa motor 1.  
-                motores(pasos1,IZQUIERDA);
+            case '3':
+                output_high(PIN_A3);
+                motores2(pasos,direccion);
                 break;
 
-            case '4': //motor 2 a la derecha.
-                //printf("Ingrese pasos\n\r");
-                fgets(darpasos);
-                pasos1=atoi32(darpasos);
-                //printf("caso 4 derecha");
-                output_high(PIN_A3); // Activa motor 1.
-                motores(pasos1,DERECHA);
-                break;
-
-            case '5': //motor 3 a la izquierda.
-                //printf("Ingrese pasos\n\r");
-                fgets(darpasos);
-                pasos1=atoi32(darpasos);
-                //printf("caso 5 izquierda");
-                output_high(PIN_A4); // Activa motor 1.  
-                motores(pasos1,IZQUIERDA);
-                break;
-
-            case '6': //motor 3 a la derecha.
-                //printf("Ingrese pasos\n\r");
-                fgets(darpasos);
-                pasos1=atoi32(darpasos);
-                //printf("caso 6 derecha");
-                output_high(PIN_A4); // Activa motor 1.
-                motores(pasos1,DERECHA);
-
-                break;
 
             case '8': 
                 printf("Setup Calibracion Quick\n\r");
@@ -282,9 +200,9 @@ loopInfinito:
                 printf("izq_steps ->%Ld<-  \n\r",izq_steps);
                 printf("der_steps ->%Ld<-  \n\r",der_steps);
                 
-                motores4(izq_steps,IZQUIERDA,700);
+                motores4(izq_steps,IZQUIERDA,velocidad);
                 delay_us(200);
-                motores4(der_steps,DERECHA,100);
+                motores4(der_steps,DERECHA,200);
                 delay_us(200);
 
             case '7': // PWMs-LEDs
