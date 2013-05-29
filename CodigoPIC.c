@@ -45,10 +45,10 @@ void main()
 
 
     // ************************ CONFIGURACIÓN PWM1 y PWM2: ************************
-    int brillo=50;
+    int32 brillo=50;
     int retardo=1; // Retardo por defecto de 1[ms]
     int t_on=100;  //Tiempo en [ms] que se mantiene encendido el trigger CCD (0 si se desea on-off instantáneo)
-    int16 exposicion=500;   //Tiempo de exposición de la cámara en [ms]
+    int32 exposicion=500;   //Tiempo de exposición de la cámara en [ms]
     int aux=1;
     int32 der_steps=0;
     int32 izq_steps=0;
@@ -82,9 +82,9 @@ void main()
         output_low(PIN_A4);
 
 
-        printf("Set parameters: e=exposicion, v=velocidad");
-        printf("                 b=brillo, d=direccion, p=pasos\n\r");
-        printf("                l=led, m=motores, 8=loop\n\r");
+        printf("Set parameters: e=exposicion, v=velocidad(%Ld)\n\r",velocidad);
+        printf("                b=brillo, d=direccion(%Ld), p=pasos(%Ld)\n\r",direccion,pasos);
+        printf("                l=led, m=motores(%Ld) \n\r",motor);
         seleccionar=getc();
 
         switch(seleccionar)
@@ -156,6 +156,7 @@ inicia1:
                 break;
 
             case '3':
+                printf("Motor3, pasos%Ld, dir %Ld\n\r",pasos,direccion);
                 output_high(PIN_A3);
                 motores2(pasos,direccion);
                 break;
@@ -186,8 +187,6 @@ loopInfinito:
             case '9': 
                 printf("Setup Velocidad ...\n\r");
                 output_high(PIN_A4); 
-                motores3(2147483640,DERECHA);
-                delay_us(200);
                 motores2(100,IZQUIERDA);
                 delay_us(200);
                 izq_steps = motores3(2147483640,IZQUIERDA);
