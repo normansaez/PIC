@@ -144,7 +144,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 set_pwm1_duty(50*20000000/(100*2000*16));
                 set_pwm2_duty(50*20000000/(100*2000*16));
                 printf("Ingrese tiempo de exposicion en [ms] y [ENTER]\n\r");
-                fgets(timeon_string)
+                fgets(timeon_string);
                 timeon=atoi32(timeon_string);
                 led_control(led,timeon);
                 break;
