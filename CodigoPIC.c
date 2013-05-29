@@ -134,45 +134,54 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 break;
 
             case 'l':
-                printf("Ingrese Led a encender: 0 a 7 y [ENTER]\n\r");
-                char led_string;
+                char led_string[5];
                 char timeon_string[5];
                 int32 led=0;
                 int32 timeon=0;
+
+                printf("Ingrese Led a encender: 0 a 7 y [ENTER]\n\r");
                 fgets(led_string);
                 led=atoi32(led_string);
                 set_pwm1_duty(50*20000000/(100*2000*16));
                 set_pwm2_duty(50*20000000/(100*2000*16));
+
                 printf("Ingrese tiempo de exposicion en [ms] y [ENTER]\n\r");
                 fgets(timeon_string);
                 timeon=atoi32(timeon_string);
+
                 led_control(led,timeon);
                 break;
 
             case 'm':
+                char motor_string[5];
+                int32 motor=0;
+                int dir=0;
+
                 printf("Ingrese pasos a dar y [ENTER]\n\r");
                 fgets(darpasos);
                 pasos1=atoi32(darpasos);
+
                 printf("Ingrese direccion: 0 o 1 donde 1=DERECHA, 0=IZQUIERDA y [ENTER]\n\r");
                 fgets(darpasos);
                 direccion=atoi32(darpasos);
-                int dir=0;
                 dir = direccion?DERECHA:IZQUIERDA;
+
                 printf("Ingrese el numero de motor a utlizar: 1,2 o 3 y [ENTER]\n\r");
-                char motor;
-                fgets(motor);
-                printf("Motor: %c , Direccion: %d, pasos %Ld\n\r",motor,dir,pasos1);
+                fgets(motor_string);
+                motor = atoi32(motor_string);               
+                printf("Motor: %Ld , Direccion: %d, pasos %Ld\n\r",motor,dir,pasos1);
+
                 switch(motor)
                 {
-                    case '1':
+                    case 1:
                         output_high(PIN_A2); 
                         motores(pasos1,dir);
                         break;
-                    case '2':
+                    case 2:
                         output_high(PIN_A3);
                         motores(pasos1,dir);
                         break;
-                    case '3':
+                    case 3:
                         output_high(PIN_A4);
                         motores(pasos1,dir);
                         break;
