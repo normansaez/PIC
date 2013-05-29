@@ -125,42 +125,48 @@ inicia1:
                 printf("Ingrese direccion 1=Derecha, 0=Izquierda y [ENTER]\n\r");
                 fgets(leido_pantalla);
                 direccion = atoi32(leido_pantalla);               
-                printf("Direccion: %Ld\n\r",direccion);
+//                printf("Direccion: %Ld\n\r",direccion);
                 break;
 
             case 'p':
                 printf("Ingrese el numero de pasos a utlizar y [ENTER]\n\r");
                 fgets(leido_pantalla);
                 pasos = atoi32(leido_pantalla);               
-                printf("Pasos: %Ld\n\r",pasos);
+//                printf("Pasos: %Ld\n\r",pasos);
                 break;
 
             case 'm':
                 printf("Ingrese el numero de motor a utlizar: 1,2 o 3 y [ENTER]\n\r");
                 fgets(leido_pantalla);
                 motor = atoi32(leido_pantalla);               
-                printf("Motor: %Ld\n\r",motor);
+//                printf("Motor: %Ld\n\r",motor);
                 //output_high(PIN_A2); 
                 //motores(pasos,dir);
                 break;
 
 
             case '1':
+                //printf("Motor: 1, pasos%Ld, dir %Ld\n\r",pasos,direccion);
                 output_high(PIN_A2);
                 motores2(pasos,direccion);
                 break;
 
             case '2':
+                //printf("Motor: 2, pasos%Ld, dir %Ld\n\r",pasos,direccion);
                 output_high(PIN_A3);
                 motores2(pasos,direccion);
                 break;
 
             case '3':
-                printf("Motor3, pasos%Ld, dir %Ld\n\r",pasos,direccion);
-                output_high(PIN_A3);
+                printf("Motor: 3, pasos%Ld, dir %Ld\n\r",pasos,direccion);
+                output_high(PIN_A4);
                 motores2(pasos,direccion);
                 break;
 
+            case '4':
+                printf("Led %Ld\n\r",led);
+                led_control(led,exposicion);
+                break;
 
             case '8': 
                 printf("Setup Calibracion Quick\n\r");
