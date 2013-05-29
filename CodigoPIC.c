@@ -18,6 +18,7 @@ void motor_off();
 void motores(int32 pasos, int dir);
 int motores2(int32 pasos, int dir);
 int32 motores3(int32 pasos, int dir);
+int32 motores4(int32 pasos, int dir,int32 velocidad);
 
 void main()
 {
@@ -52,10 +53,6 @@ void main()
     char expo[5];
     int16 exposicion=500;   //Tiempo de exposición de la cámara en [ms]
     int aux=1;
-//    int1 status=1;
-//    int direccion=1;
-//    int32 error=0;
-//    int32 steps=0;
     int32 der_steps=0;
     int32 izq_steps=0;
 
@@ -72,10 +69,7 @@ void main()
     //*************** INICIO ***************
 
     int32 pasos1;
-    //int dir1;
-
-
-
+    int32 direccion=1;
     char darpasos[5];
 
 
@@ -88,7 +82,7 @@ void main()
         output_low(PIN_A4);
 
 
-        printf("Seleccione a, b, e, 1, 2, 3, 4, 5, 6 , 7. 8 =test, 9= cal\n\r");
+        printf("Seleccione a, b, e, 1, 2, 3, 4, 5, 6 , 7.m=motores, 8=loop, 9= velocidad\n\r");
         seleccionar=getc();
 
 
@@ -139,6 +133,39 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 set_pwm2_duty(v2*20000000/(100*2000*16));
                 printf("Ciclo de Trabajo PWM2 es; %d",v2);
                 printf("\n\r");
+                break;
+
+            case 'm':
+                printf("Ingrese pasos a dar:\n\r");
+                fgets(darpasos);
+                pasos1=atoi32(darpasos);
+                printf("Ingrese direccion: 0 o 1 donde 1=DERECHA, 0=IZQUIERDA:\n\r");
+                fgets(darpasos);
+                direccion=atoi32(darpasos);
+                int dir=0;
+                dir = direccion?DERECHA:IZQUIERDA;
+                printf("Ingrese el numero de motor a utlizar: 1,2 o 3\n\r");
+                char motor;
+                motor=getc();
+                printf("Motor: %c , Direccion: %d, pasos %Ld\n\r",motor,dir,pasos1);
+                switch(motor)
+                {
+                    case '1':
+                        output_high(PIN_A2); 
+                        motores(pasos1,dir);
+                        break;
+                    case '2':
+                        output_high(PIN_A3);
+                        motores(pasos1,dir);
+                        break;
+                    case '3':
+                        output_high(PIN_A4);
+                        motores(pasos1,dir);
+                        break;
+                    default:
+                        printf("Motor invalido, use 1 o 2 o 3\n\r");
+                        break;
+                }
                 break;
 
 
@@ -198,9 +225,7 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
                 break;
 
             case '8': 
-                printf("Setup calibracion quick\n\r");
-                der_steps = 500;
-                izq_steps = 500;
+                printf("Setup Calibracion Quick\n\r");
                 output_high(PIN_A4); 
                 motores3(2147483640,DERECHA);
                 delay_us(200);
@@ -220,6 +245,26 @@ loopInfinito:
                 motores2(der_steps,DERECHA);
                 delay_us(200);
                 goto loopInfinito;
+
+            case '9': 
+                printf("Setup Velocidad ...\n\r");
+                output_high(PIN_A4); 
+                motores3(2147483640,DERECHA);
+                delay_us(200);
+                motores2(100,IZQUIERDA);
+                delay_us(200);
+                izq_steps = motores3(2147483640,IZQUIERDA);
+                delay_us(200);
+                motores2(100,DERECHA);
+                delay_us(200);
+                der_steps = motores3(2147483640,DERECHA);
+                printf("izq_steps ->%Ld<-  \n\r",izq_steps);
+                printf("der_steps ->%Ld<-  \n\r",der_steps);
+                
+                motores4(izq_steps,IZQUIERDA,700);
+                delay_us(200);
+                motores4(der_steps,DERECHA,100);
+                delay_us(200);
 
             case '7': // PWMs-LEDs
 
@@ -347,6 +392,33 @@ void motor_off(){
     output_low(PIN_A4);
 }
 
+int32 motores4(int32 pasos, int dir,int32 velocidad)
+{
+    int32 y=0;
+    int1 status=1;
+    output_low(PIN_A1);  //STEP
+    if(dir==0)
+    {
+        output_low(PIN_A0);
+    }
+    if(dir==1)
+    {
+        output_high(PIN_A0);
+    }
+    delay_ms(velocidad);
+    for(y=0;y<pasos;y++)
+    {
+        output_low(PIN_A1);
+        output_high(PIN_A1);
+        status = input_state(PIN_A5);
+        if (status == 0){
+            printf("status sensor ->%d<-  \n\r",status);
+            return y;
+        }
+        delay_us(velocidad);
+    }
+    return y;
+}
 int32 motores3(int32 pasos, int dir)
 {
     int32 y=0;
