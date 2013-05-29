@@ -45,12 +45,9 @@ void main()
 
 
     // ************************ CONFIGURACIÓN PWM1 y PWM2: ************************
-    int v1=50;
-    int v2=50;
+    int brillo=50;
     int retardo=1; // Retardo por defecto de 1[ms]
     int t_on=100;  //Tiempo en [ms] que se mantiene encendido el trigger CCD (0 si se desea on-off instantáneo)
-    char ciclo[3];
-    char expo[5];
     int16 exposicion=500;   //Tiempo de exposición de la cámara en [ms]
     int aux=1;
     int32 der_steps=0;
@@ -58,8 +55,8 @@ void main()
     int32 led=0;
     int32 motor=0;
     int32 direccion=0;
-    int32 pasos;
-    int32 velocidad;
+    int32 pasos=0;
+    int32 velocidad=0;
     char leido_pantalla[5];
 
     output_low(PIN_B0);
@@ -102,20 +99,20 @@ void main()
 
             case 'e': 
                 printf("Ingrese tiempo de exposicion en [ms] y pulse [ENTER]\n\r");
-                fgets(expo);
-                exposicion=atoi32(expo);
+                fgets(leido_pantalla);
+                exposicion=atoi32(leido_pantalla);
                 printf("Exposicion en [ms]: %Ld \n\r",exposicion);
                 break;
 
             case 'b':
 inicia1:
                 printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) y pulse (brillo) [ENTER]:\n\r");
-                fgets(ciclo);
-                v1=atoi(ciclo);
-                if(v1>100 || v1<=0)
+                fgets(leido_pantalla);
+                brillo=atoi(leido_pantalla);
+                if(brillo>100 || brillo<=0)
                     goto inicia1;
-                set_pwm1_duty(v1*20000000/(100*2000*16));
-                set_pwm2_duty(v1*20000000/(100*2000*16));
+                set_pwm1_duty(brillo*20000000/(100*2000*16));
+                set_pwm2_duty(brillo*20000000/(100*2000*16));
                 break;
 
             case 'l':
@@ -129,19 +126,20 @@ inicia1:
                 fgets(leido_pantalla);
                 direccion = atoi32(leido_pantalla);               
                 printf("Direccion: %Ld\n\r",direccion);
+                break;
 
             case 'p':
                 printf("Ingrese el numero de pasos a utlizar y [ENTER]\n\r");
                 fgets(leido_pantalla);
                 pasos = atoi32(leido_pantalla);               
                 printf("Pasos: %Ld\n\r",pasos);
+                break;
 
             case 'm':
                 printf("Ingrese el numero de motor a utlizar: 1,2 o 3 y [ENTER]\n\r");
                 fgets(leido_pantalla);
                 motor = atoi32(leido_pantalla);               
                 printf("Motor: %Ld\n\r",motor);
-
                 //output_high(PIN_A2); 
                 //motores(pasos,dir);
                 break;
@@ -199,11 +197,12 @@ loopInfinito:
                 der_steps = motores3(2147483640,DERECHA);
                 printf("izq_steps ->%Ld<-  \n\r",izq_steps);
                 printf("der_steps ->%Ld<-  \n\r",der_steps);
-                
+
                 motores4(izq_steps,IZQUIERDA,velocidad);
                 delay_us(200);
                 motores4(der_steps,DERECHA,200);
                 delay_us(200);
+                break;
 
             case '7': // PWMs-LEDs
 
