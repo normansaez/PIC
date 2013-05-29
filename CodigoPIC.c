@@ -16,6 +16,7 @@
 
 void motor_off();
 void motores(int32 pasos, int dir);
+void led_control(int32 led, int32 timeon);
 int motores2(int32 pasos, int dir);
 int32 motores3(int32 pasos, int dir);
 int32 motores4(int32 pasos, int dir,int32 velocidad);
@@ -83,7 +84,7 @@ void main()
 
 
         printf("Seleccione a, b, e, 1, 2, 3, 4, 5, 6 , 7\n\r");
-        printf("           m=motores, 8=loop, 9= velocidad\n\r");
+        printf("           l=led, m=motores, 8=loop, 9= velocidad\n\r");
         seleccionar=getc();
 
         switch(seleccionar)
@@ -91,47 +92,61 @@ void main()
 
             case 'e': // define tiempo de exposición.
 
-                printf("Ingrese tiempo de exposicion en [ms] y pulse ENTER:\n\r");
+                //printf("Ingrese tiempo de exposicion en [ms] y pulse ENTER:\n\r");
                 fgets(expo);
                 exposicion=atoi32(expo);
-                printf("Exposicion en [ms]: ");
-                printf("%Ld \n\r",exposicion);
+                //printf("Exposicion en [ms]: ");
+                //printf("%Ld \n\r",exposicion);
                 break;
 
             case 'a': // Define Ciclo PWM1.
 
 inicia1: //Label usado para redirigir el programa ante error en ingreso de Ciclo.
 
-                printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) y pulse ENTER:\n\r");
+                //printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) y pulse ENTER:\n\r");
                 fgets(ciclo);
                 v1=atoi(ciclo);
                 if(v1>100 || v1<=0)
                 {
-                    printf("Ingrese un número entero valido\n\r");
+                    //printf("Ingrese un número entero valido\n\r");
                     goto inicia1;
                 }
                 set_pwm1_duty(v1*20000000/(100*2000*16));
-                printf("Ciclo de Trabajo PWM1 es; %d",v1);
-                printf("\n\r");
+                //printf("Ciclo de Trabajo PWM1 es; %d\n\r",v1);
                 break;
 
             case 'b':
 
 inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo.
 
-                printf("Ingrese Ciclo de Trabajo para PWM2 (0-100) y pulse ENTER:\n\r");
+                //printf("Ingrese Ciclo de Trabajo para PWM2 (0-100) y pulse ENTER:\n\r");
                 fgets(ciclo2);
                 v2=atoi(ciclo2);
 
                 if(v2>100 || v2<=0)
                 {
-                    printf("Ingrese un número entero valido\n\r");
+                    //printf("Ingrese un número entero valido\n\r");
                     goto inicia2;
                 }
 
                 set_pwm2_duty(v2*20000000/(100*2000*16));
-                printf("Ciclo de Trabajo PWM2 es; %d",v2);
-                printf("\n\r");
+                //printf("Ciclo de Trabajo PWM2 es; %d\n\r",v2);
+                break;
+
+            case 'l':
+                printf("Led a encender: 0 a 7\n\r");
+                char led_string;
+                char timeon_string[5];
+                int32 led=0;
+                int32 timeon=0;
+                led_string=getc();
+                led=atoi32(led_string);
+                set_pwm1_duty(50*20000000/(100*2000*16));
+                set_pwm2_duty(50*20000000/(100*2000*16));
+                printf("Ingrese tiempo de exposicion en [ms]:\n\r");
+                timeon_string=getc();
+                timeon=atoi32(timeon_string);
+                led_control(led,timeon);
                 break;
 
             case 'm':
@@ -169,55 +184,55 @@ inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo
 
 
             case '1': //motor 1 a la izquierda.
-                printf("Ingrese pasos\n\r");
+                //printf("Ingrese pasos\n\r");
                 fgets(darpasos);
                 pasos1=atoi32(darpasos);
-                printf("caso 1 izquierda");
+                //printf("caso 1 izquierda");
                 output_high(PIN_A2); // Activa motor 1.  
                 motores(pasos1,IZQUIERDA);
                 break;
 
             case '2': //motor 1 a la derecha.
-                printf("Ingrese pasos\n\r");
+                //printf("Ingrese pasos\n\r");
                 fgets(darpasos);
                 pasos1=atoi32(darpasos);
-                printf("caso 2 derecha");
+                //printf("caso 2 derecha");
                 output_high(PIN_A2); // Activa motor 1.
                 motores(pasos1,DERECHA);
                 break;
 
             case '3': //motor 2 a la izquierda.
-                printf("Ingrese pasos\n\r");
+                //printf("Ingrese pasos\n\r");
                 fgets(darpasos);
                 pasos1=atoi32(darpasos);
-                printf("caso 3 izquierda");
+                //printf("caso 3 izquierda");
                 output_high(PIN_A3); // Activa motor 1.  
                 motores(pasos1,IZQUIERDA);
                 break;
 
             case '4': //motor 2 a la derecha.
-                printf("Ingrese pasos\n\r");
+                //printf("Ingrese pasos\n\r");
                 fgets(darpasos);
                 pasos1=atoi32(darpasos);
-                printf("caso 4 derecha");
+                //printf("caso 4 derecha");
                 output_high(PIN_A3); // Activa motor 1.
                 motores(pasos1,DERECHA);
                 break;
 
             case '5': //motor 3 a la izquierda.
-                printf("Ingrese pasos\n\r");
+                //printf("Ingrese pasos\n\r");
                 fgets(darpasos);
                 pasos1=atoi32(darpasos);
-                printf("caso 5 izquierda");
+                //printf("caso 5 izquierda");
                 output_high(PIN_A4); // Activa motor 1.  
                 motores(pasos1,IZQUIERDA);
                 break;
 
             case '6': //motor 3 a la derecha.
-                printf("Ingrese pasos\n\r");
+                //printf("Ingrese pasos\n\r");
                 fgets(darpasos);
                 pasos1=atoi32(darpasos);
-                printf("caso 6 derecha");
+                //printf("caso 6 derecha");
                 output_high(PIN_A4); // Activa motor 1.
                 motores(pasos1,DERECHA);
 
@@ -383,6 +398,30 @@ salir:
 
 
 }  //FIN MAIN
+
+void led_control(int32 led, int32 timeon){
+    //Apagar todos los pin de leds.
+    output_low(PIN_B0);
+    output_low(PIN_B1);
+    output_low(PIN_B2);
+    output_low(PIN_B3);
+    output_low(PIN_B4);
+    //Matriz A Enable
+    output_high(PIN_B3);
+    //Descomposicion LED para encender demux
+    ((led & 1) == 1) ? output_high(PIN_B0):output_low(PIN_B0);
+    ((led & 2) == 2) ? output_high(PIN_B1):output_low(PIN_B1);
+    ((led & 4) == 4) ? output_high(PIN_B2):output_low(PIN_B2);
+    //Time encendido
+    delay_ms(timeon);
+    output_low(PIN_B0);
+    output_low(PIN_B1);
+    output_low(PIN_B2);
+    output_low(PIN_B3);
+    output_low(PIN_B4);
+
+}
+
 void motor_off(){
     output_low(PIN_A1); 
     delay_ms(100);
