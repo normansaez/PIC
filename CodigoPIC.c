@@ -82,10 +82,9 @@ void main()
         output_low(PIN_A4);
 
 
-        printf("Seleccione a, b, e, 1, 2, 3, 4, 5, 6 , 7.m=motores, 8=loop, 9= velocidad\n\r");
+        printf("Seleccione a, b, e, 1, 2, 3, 4, 5, 6 , 7\n\r");
+        printf("           m=motores, 8=loop, 9= velocidad\n\r");
         seleccionar=getc();
-
-
 
         switch(seleccionar)
         {
