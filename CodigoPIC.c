@@ -16,11 +16,13 @@
 
 void motor_off();
 void motores(int32 pasos, int dir);
-void led_on(int32 led, int32 timeon);
+void led_on_off(int32 led, int32 timeon);
 int motores2(int32 pasos, int dir);
 int32 motores3(int32 pasos, int dir);
 int32 motores4(int32 pasos, int dir,int32 velocidad);
 void motor_on(int32 motor, int32 pasos, int32 direccion);
+void led_on(int32 led);
+void led_off();
 
 void main()
 {
@@ -142,7 +144,7 @@ inicia1:
                 break;
 
             case '4':
-                led_on(led,exposicion);
+                led_on_off(led,exposicion);
                 break;
 
             case '8': 
@@ -203,7 +205,30 @@ void motor_on(int32 motor, int32 pasos, int32 direccion){
     motor_off();
 }
 
-void led_on(int32 led, int32 timeon){
+void led_off(){
+    output_low(PIN_B0);
+    output_low(PIN_B1);
+    output_low(PIN_B2);
+    output_low(PIN_B3);
+    output_low(PIN_B4);
+}
+
+void led_on(int32 led){
+    //Apagar todos los pin de leds.
+    output_low(PIN_B0);
+    output_low(PIN_B1);
+    output_low(PIN_B2);
+    output_low(PIN_B3);
+    output_low(PIN_B4);
+    //Matriz A Enable
+    output_high(PIN_B3);
+    //Descomposicion LED para encender demux
+    ((led & 1) == 1) ? output_high(PIN_B0):output_low(PIN_B0);
+    ((led & 2) == 2) ? output_high(PIN_B1):output_low(PIN_B1);
+    ((led & 4) == 4) ? output_high(PIN_B2):output_low(PIN_B2);
+}
+
+void led_on_off(int32 led, int32 timeon){
     printf("Led %Ld\n\r",led);
     //Apagar todos los pin de leds.
     output_low(PIN_B0);
@@ -219,12 +244,7 @@ void led_on(int32 led, int32 timeon){
     ((led & 4) == 4) ? output_high(PIN_B2):output_low(PIN_B2);
     //Time encendido
     delay_ms(timeon);
-    output_low(PIN_B0);
-    output_low(PIN_B1);
-    output_low(PIN_B2);
-    output_low(PIN_B3);
-    output_low(PIN_B4);
-
+    led_off();
 }
 
 void motor_off(){
