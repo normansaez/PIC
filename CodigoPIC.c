@@ -160,7 +160,7 @@ void main()
                 dir = direccion;
                 steps = pasos;
                 motor_on(motor); 
-                while(pasos_restantes != 0){
+                while(pasos_restantes > 0){
                     delay_us(200);
                     steps = motores4(steps,dir,velocidad);
                     delay_us(200);
@@ -337,7 +337,3 @@ int motores2(int32 pasos, int dir)
     }
     return 0;
 }
-
-
-
-
