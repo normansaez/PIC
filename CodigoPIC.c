@@ -166,7 +166,7 @@ void main()
                     delay_us(200);
                     motores2(100,dir);
                     pasos_restantes = pasos - steps;
-                    (dir == 0)?1:0;
+                    dir = (dir == 0)?1:0;
                 }
 
             case '8': 
