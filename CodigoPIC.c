@@ -82,31 +82,29 @@ void main()
         output_low(PIN_A4);
 
 
-        printf("Set parameters: e=exposicion, v=velocidad(%Ld)\n\r",velocidad);
-        printf("                b=brillo, d=direccion(%Ld), p=pasos(%Ld)\n\r",direccion,pasos);
-        printf("                l=led, m=motores(%Ld) \n\r",motor);
+        printf("Set parameters: e=exposicion(%Ld), v=velocidad(%Ld)\n\r",exposicion,velocidad);
+        printf("                b=brillo(%Ld), d=direccion(%Ld), p=pasos(%Ld)\n\r",brillo,direccion,pasos);
+        printf("                l=led(%Ld), m=motores(%Ld) \n\r",led,motor);
         seleccionar=getc();
 
         switch(seleccionar)
         {
 
             case 'v':
-                printf("Ingrese Velocidad en ms y pulse [ENTER]\n\r");
+                printf("Ingrese Velocidad en [ms] y [ENTER]\n\r");
                 fgets(leido_pantalla);
                 velocidad=atoi32(leido_pantalla);
-                printf("Exposicion en [ms]: %Ld \n\r",exposicion);
                 break;
 
             case 'e': 
-                printf("Ingrese tiempo de exposicion en [ms] y pulse [ENTER]\n\r");
+                printf("Ingrese tiempo de exposicion en [ms] y [ENTER]\n\r");
                 fgets(leido_pantalla);
                 exposicion=atoi32(leido_pantalla);
-                printf("Exposicion en [ms]: %Ld \n\r",exposicion);
                 break;
 
             case 'b':
                 while(brillo>100 || brillo<=0){
-                    printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) y pulse (brillo) [ENTER]:\n\r");
+                    printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) (brillo) y [ENTER]:\n\r");
                     fgets(leido_pantalla);
                     brillo=atoi(leido_pantalla);
                 }
