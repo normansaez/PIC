@@ -104,11 +104,9 @@ void main()
                 break;
 
             case 'b':
-                while(brillo>100 || brillo<=0){
-                    printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) (brillo) y [ENTER]:\n\r");
-                    fgets(leido_pantalla);
-                    brillo=atoi(leido_pantalla);
-                }
+                printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) (brillo) y [ENTER]:\n\r");
+                fgets(leido_pantalla);
+                brillo=atoi(leido_pantalla);
                 set_pwm1_duty(brillo*20000000/(100*2000*16));
                 set_pwm2_duty(brillo*20000000/(100*2000*16));
                 break;
@@ -154,20 +152,23 @@ void main()
                 break;
 
             case '5': 
-                int32 pasos_restantes = 1;
+                int32 pasos_restantes;
                 int32 steps;
                 int dir;
                 dir = direccion;
                 steps = pasos;
+                pasos_restantes = pasos;
                 motor_on(motor); 
                 while(pasos_restantes > 0){
+                    printf("pasos_restantes ->%Ld<-  \n\r",pasos_restantes);
                     delay_us(200);
                     steps = motores4(steps,dir,velocidad);
                     delay_us(200);
-                    motores2(100,dir);
-                    pasos_restantes = pasos - steps;
                     dir = (dir == 0)?1:0;
+                    motores2(100,dir);
+                    pasos_restantes = pasos_restantes - steps;
                 }
+                printf("pasos_restantes fin \n\r");
 
             case '8': 
                 printf("Setup Calibracion Quick\n\r");
