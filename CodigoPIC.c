@@ -176,9 +176,30 @@ void main()
                 //printf("pasos_restantes fin: %Ld  step->%Ld<-\n\r",pasos_restantes,steps);
                 break;
 
+            case '6': 
+                int32 pasos_restantes2;
+                int32 steps2;
+                int dir2;
+                dir2 = direccion;
+                steps2 = pasos;
+                pasos_restantes2 = pasos;
+                motor_on(motor); 
+                while(true){
+                    printf("pasos restantes: %Ld\n\r",pasos_restantes2);
+                    delay_us(200);
+                    steps2 = motores4(pasos_restantes2,dir2,velocidad);
+                    delay_us(200);
+                    dir2 = (dir2 == 0)?1:0;
+                    motores2(100,dir2);
+                    pasos_restantes2 = pasos_restantes2 - steps2;
+                    if (pasos_restantes2 <=0)
+                        pasos_restantes2 = pasos;
+                }
+                break;
+
             case '8': 
                 printf("Setup Calibracion Quick\n\r");
-                output_high(PIN_A4); 
+                motor_on(motor); 
                 motores3(2147483640,DERECHA);
                 delay_us(200);
                 motores2(100,IZQUIERDA);
