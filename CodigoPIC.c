@@ -1,7 +1,6 @@
 #include <16F877A.h> //Carga el PIC a utilizar.
 #include <stdio.h>  // Permite usar librería de ATOI (convierte string a entero)
 #include <stdlib.h> // idem requerido.
-#include <limits.h>
 
 #define DERECHA 1
 #define IZQUIERDA 0
@@ -15,10 +14,16 @@
 #use fast_io(a)
 #use fast_io(b)
 
+void motor_off();
+void motores(int32 pasos, int dir);
+void led_on_off(int32 led, int32 timeon);
 int motores2(int32 pasos, int dir);
 int32 motores3(int32 pasos, int dir);
-void motores(int32 pasos, int dir);
-void loop_phase(int32 izq_steps, int32 der_steps);
+int32 motores4(int32 pasos, int dir,int32 velocidad);
+void motor_move(int32 motor, int32 pasos, int32 direccion);
+void led_on(int32 led);
+void led_off();
+void motor_on(int32 motor);
 
 void main()
 {
@@ -44,18 +49,16 @@ void main()
 
 
     // ************************ CONFIGURACIÓN PWM1 y PWM2: ************************
-
-    int v1=50;
-    int v2=50;
-    int retardo=1; // Retardo por defecto de 1[ms]
-    int t_on=100;  //Tiempo en [ms] que se mantiene encendido el trigger CCD (0 si se desea on-off instantáneo)
-    int aux=1;
-    char ciclo[3];
-    char ciclo2[3];
-    char expo[5];
-    int16 exposicion=500;   //Tiempo de exposición de la cámara en [ms]
+    int32 brillo=0;
+    int32 exposicion=500;   //Tiempo de exposición de la cámara en [ms]
     int32 der_steps=0;
     int32 izq_steps=0;
+    int32 led=0;
+    int32 motor=0;
+    int32 direccion=0;
+    int32 pasos=0;
+    int32 velocidad=0;
+    char leido_pantalla[5];
 
     output_low(PIN_B0);
     output_low(PIN_B1);
@@ -69,272 +72,264 @@ void main()
 
     //*************** INICIO ***************
 
-    int32 pasos1;
-    //int dir1;
-
-
-
-    char darpasos[5];
 
 
     while(true)
     {
+
         char seleccionar=0;
         output_low(PIN_A2);
         output_low(PIN_A3);
         output_low(PIN_A4);
 
-        printf("Seleccione a, b, e, 1, 2, 3, 4, 5, 6 , 7. 8=>cal y loop\n\r");
+
+        printf("Set parameters: e=exposicion(%Ld), v=velocidad(%Ld)\n\r",exposicion,velocidad);
+        printf("                b=brillo(%Ld), d=direccion(%Ld), p=pasos(%Ld)\n\r",brillo,direccion,pasos);
+        printf("                l=led(%Ld), m=motores(%Ld) \n\r",led,motor);
         seleccionar=getc();
+
         switch(seleccionar)
         {
 
-            case 'e': // define tiempo de exposición.
-                printf("Ingrese tiempo de exposicion en [ms] y pulse ENTER:\n\r");
-                fgets(expo);
-                exposicion=atoi32(expo);
-                printf("Exposicion en [ms]: ");
-                printf("%Ld \n\r",exposicion);
+            case 'v':
+                printf("Ingrese Velocidad en [ms] y [ENTER]\n\r");
+                fgets(leido_pantalla);
+                velocidad=atoi32(leido_pantalla);
                 break;
-            case 'a': // Define Ciclo PWM1.
 
-inicia1: //Label usado para redirigir el programa ante error en ingreso de Ciclo.
-
-                printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) y pulse ENTER:\n\r");
-                fgets(ciclo);
-                v1=atoi(ciclo);
-                if(v1>100 || v1<=0)
-                {
-                    printf("Ingrese un número entero valido\n\r");
-                    goto inicia1;
-                }
-                set_pwm1_duty(v1*20000000/(100*2000*16));
-                printf("Ciclo de Trabajo PWM1 es; %d",v1);
-                printf("\n\r");
+            case 'e': 
+                printf("Ingrese tiempo de exposicion en [ms] y [ENTER]\n\r");
+                fgets(leido_pantalla);
+                exposicion=atoi32(leido_pantalla);
                 break;
 
             case 'b':
-
-inicia2: //Label usado para redirigir el programa ante error en ingreso de Ciclo.
-
-                printf("Ingrese Ciclo de Trabajo para PWM2 (0-100) y pulse ENTER:\n\r");
-                fgets(ciclo2);
-                v2=atoi(ciclo2);
-
-                if(v2>100 || v2<=0)
-                {
-                    printf("Ingrese un número entero valido\n\r");
-                    goto inicia2;
+                while(brillo>100 || brillo<=0){
+                    printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) (brillo) y [ENTER]:\n\r");
+                    fgets(leido_pantalla);
+                    brillo=atoi(leido_pantalla);
                 }
-
-                set_pwm2_duty(v2*20000000/(100*2000*16));
-                printf("Ciclo de Trabajo PWM2 es; %d",v2);
-                printf("\n\r");
+                set_pwm1_duty(brillo*20000000/(100*2000*16));
+                set_pwm2_duty(brillo*20000000/(100*2000*16));
                 break;
 
-
-            case '1': //motor 1 a la izquierda.
-                printf("Ingrese pasos: M1-> IZQ\n\r");
-                fgets(darpasos);
-                pasos1=atoi32(darpasos);
-                output_high(PIN_A2); // Activa motor 1.  
-                motores(pasos1,IZQUIERDA);
+            case 'l':
+                printf("Ingrese Led a encender: 0 a 7 y [ENTER]\n\r");
+                fgets(leido_pantalla);
+                led=atoi32(leido_pantalla);
                 break;
 
-            case '2': //motor 1 a la derecha.
-                printf("Ingrese pasos M1->DER\n\r");
-                fgets(darpasos);
-                pasos1=atoi32(darpasos);
-                output_high(PIN_A2); // Activa motor 1.
-                motores(pasos1,DERECHA);
+            case 'd':
+                printf("Ingrese direccion 1=Derecha, 0=Izquierda y [ENTER]\n\r");
+                fgets(leido_pantalla);
+                direccion = atoi32(leido_pantalla);               
                 break;
 
-            case '3': //motor 2 a la izquierda.
-                printf("Ingrese pasos M2->IZQ\n\r");
-                fgets(darpasos);
-                pasos1=atoi32(darpasos);
-                output_high(PIN_A3); // Activa motor 2.  
-                motores(pasos1,IZQUIERDA);
+            case 'p':
+                printf("Ingrese el numero de pasos a utlizar y [ENTER]\n\r");
+                fgets(leido_pantalla);
+                pasos = atoi32(leido_pantalla);               
                 break;
 
-            case '4': //motor 2 a la derecha.
-                printf("Ingrese pasos M2->DER\n\r");
-                fgets(darpasos);
-                pasos1=atoi32(darpasos);
-                output_high(PIN_A3); // Activa motor 2.
-                motores(pasos1,DERECHA);
+            case 'm':
+                printf("Ingrese el numero de motor a utlizar: 1,2 o 3 y [ENTER]\n\r");
+                fgets(leido_pantalla);
+                motor = atoi32(leido_pantalla);               
                 break;
 
-            case '5': //motor 3 a la izquierda.
-                printf("Ingrese pasos M3->IZQ\n\r");
-                fgets(darpasos);
-                pasos1=atoi32(darpasos);
-                output_high(PIN_A4); // Activa motor 3.  
-                motores(pasos1,IZQUIERDA);
+            case '1':
+                led_on(led);
                 break;
 
-            case '6': //motor 3 a la derecha.
-                printf("Ingrese pasos M3->DER\n\r");
-                fgets(darpasos);
-                pasos1=atoi32(darpasos);
-                output_high(PIN_A4); // Activa motor 3.
-                motores(pasos1,DERECHA);
-
+            case '2':
+                led_off();
                 break;
+
+            case '3':
+                motor_move(motor,pasos,direccion);
+                break;
+
+            case '4':
+                led_on_off(led,exposicion);
+                break;
+
+            case '5': 
+                int32 pasos_restantes = 1;
+                int32 steps;
+                int dir;
+                dir = direccion;
+                steps = pasos;
+                motor_on(motor); 
+                while(pasos_restantes != 0){
+                    delay_us(200);
+                    steps = motores4(steps,dir,velocidad);
+                    delay_us(200);
+                    motores2(100,dir);
+                    pasos_restantes = pasos - steps;
+                    dir = (dir == 0)?1:0;
+                }
 
             case '8': 
-                printf("Setup calibracion quick\n\r");
+                printf("Setup Calibracion Quick\n\r");
                 output_high(PIN_A4); 
-                motores3(INT_MAX,DERECHA);//A la derecha, sin contar pasos
+                motores3(2147483640,DERECHA);
                 delay_us(200);
-                motores2(100,IZQUIERDA); // salir del sensor
+                motores2(100,IZQUIERDA);
                 delay_us(200);
-                izq_steps = motores3(INT_MAX,IZQUIERDA); // Contar pasos a la izq
+                izq_steps = motores3(2147483640,IZQUIERDA);
                 delay_us(200);
-                motores2(100,DERECHA); // salir del sensor
+                motores2(100,DERECHA);
                 delay_us(200);
-                der_steps = motores3(INT_MAX,DERECHA); // Contar pasos a la der
-                loop_phase(izq_steps,der_steps); // ir al loop con los pasos contados
-
-            case '7': // PWMs-LEDs
-
-                //INICIA LEDs:
-                output_low(PIN_B0);
-                output_low(PIN_B1);
-                output_low(PIN_B2);
-                output_low(PIN_B3);
-                output_low(PIN_B4);
-                output_low(PIN_B5);
-                delay_ms(100);    //delay de 100ms para luego iniciar secuencia de control del DEMUX
-                output_high(PIN_B3); // Activa Enable para iniciar el demux en 000.
-
-                for(aux=0;aux<3;aux++)
-                {
-
-                    delay_ms(retardo);   // Delay para tener LED encendido y luego iniciar trigger CCD.
-                    output_high(PIN_B5); //Activa trigger CCD.
-                    delay_ms(t_on);
-                    output_low(PIN_B5);  //Desactiva trigger CCD.
-                    delay_ms(exposicion+retardo-t_on); // Mantiene control en LLL=> Salida Y0=1 (High) y el resto 0 (Low).
-                    output_high(PIN_B0);
-                    delay_ms(retardo);
-                    output_high(PIN_B5); //Activa trigger CCD.
-                    delay_ms(t_on);
-                    output_low(PIN_B5);
-                    delay_ms(exposicion+retardo-t_on);
-                    output_low(PIN_B0);
-                    output_high(PIN_B1);
-                    delay_ms(retardo);
-                    output_high(PIN_B5); //Activa trigger CCD.
-                    delay_ms(t_on);
-                    output_low(PIN_B5);
-                    delay_ms(exposicion+retardo-t_on);
-
-                    output_high(PIN_B0);
-                    delay_ms(retardo);
-                    output_high(PIN_B5); //Activa trigger CCD.
-                    delay_ms(t_on);
-                    output_low(PIN_B5);
-                    delay_ms(exposicion+retardo-t_on);
-
-                    output_low(PIN_B0);
-                    output_low(PIN_B1);
-                    output_high(PIN_B2);
-                    delay_ms(retardo);
-                    output_high(PIN_B5); //Activa trigger CCD.
-                    delay_ms(t_on);
-                    output_low(PIN_B5);
-                    delay_ms(exposicion+retardo-t_on);
-
-                    output_high(PIN_B0);
-                    delay_ms(retardo);
-                    output_high(PIN_B5); //Activa trigger CCD.
-                    delay_ms(t_on);
-                    output_low(PIN_B5);
-                    delay_ms(exposicion+retardo-t_on);
-
-                    output_low(PIN_B0);
-                    output_high(PIN_B1);
-                    delay_ms(retardo);
-                    output_high(PIN_B5); //Activa trigger CCD.
-                    delay_ms(t_on);
-                    output_low(PIN_B5);
-                    delay_ms(exposicion+retardo-t_on);
-
-                    output_high(PIN_B0);
-                    delay_ms(retardo);
-                    output_high(PIN_B5); //Activa trigger CCD.
-                    delay_ms(t_on);
-                    output_low(PIN_B5);
-                    delay_ms(exposicion+retardo-t_on);
-
-                    output_low(PIN_B0);  //Setea a 0 los pines para dejarlos como al inicio.
-                    output_low(PIN_B1);
-                    output_low(PIN_B2);
-                    output_low(PIN_B3);
-                    output_low(PIN_B4);
-
-                    if(aux==2)
-                    {
-                        goto salir;
-                    }
-
-                    output_high(PIN_B4); // Activa Enable Matriz Bpara iniciar el demux en 000.
+                der_steps = motores3(2147483640,DERECHA);
+                printf("izq_steps ->%Ld<-  \n\r",izq_steps);
+                printf("der_steps ->%Ld<-  \n\r",der_steps);
+                while(true){
+                    motores2(izq_steps,IZQUIERDA);
+                    delay_us(200);
+                    motores2(der_steps,DERECHA);
+                    delay_us(200);
                 }
-salir:
-                output_low(PIN_B3);
-                output_low(PIN_B4);
-                set_pwm1_duty(0); // Mantiene Ciclos en 0 para reducir consumo.
-                set_pwm2_duty(0);
-                aux=1;
 
+            case '9': 
+                printf("Setup Velocidad ...\n\r");
+                output_high(PIN_A4); 
+                motores2(100,IZQUIERDA);
+                delay_us(200);
+                izq_steps = motores3(2147483640,IZQUIERDA);
+                delay_us(200);
+                motores2(100,DERECHA);
+                delay_us(200);
+                der_steps = motores3(2147483640,DERECHA);
+                printf("izq_steps ->%Ld<-  \n\r",izq_steps);
+                printf("der_steps ->%Ld<-  \n\r",der_steps);
+
+                motores4(izq_steps,IZQUIERDA,velocidad);
+                delay_us(200);
+                motores4(der_steps,DERECHA,200);
+                delay_us(200);
                 break;
+
         }
 
     }
-} 
 
-void loop_phase(int32 izq_steps, int32 der_steps)
-{
-    output_high(PIN_A4);
-    printf("loop: izq_steps ->%Ld<-  \n\r",izq_steps);
-    printf("loop: der_steps ->%Ld<-  \n\r",der_steps);
-    while(true){
-        motores2(izq_steps,IZQUIERDA);
-        delay_us(200);
-        motores2(der_steps,DERECHA);
-        delay_us(200);
-    }
+
+
+}  //FIN MAIN
+
+void motor_on(int32 motor){
+    (motor == 1) ? output_high(PIN_A2):output_low(PIN_A2);
+    (motor == 2) ? output_high(PIN_A3):output_low(PIN_A3);
+    (motor == 3) ? output_high(PIN_A4):output_low(PIN_A4);
 }
 
-int32 motores3(int32 pasos, int dir)
+void motor_move(int32 motor, int32 pasos, int32 direccion){
+    (motor == 1) ? output_high(PIN_A2):output_low(PIN_A2);
+    (motor == 2) ? output_high(PIN_A3):output_low(PIN_A3);
+    (motor == 3) ? output_high(PIN_A4):output_low(PIN_A4);
+    printf("Motor: %Ld, pasos%Ld, dir %Ld\n\r",motor,pasos,direccion);
+    motores2(pasos,direccion);
+    motor_off();
+}
+
+void led_off(){
+    output_low(PIN_B0);
+    output_low(PIN_B1);
+    output_low(PIN_B2);
+    output_low(PIN_B3);
+    output_low(PIN_B4);
+}
+
+void led_on(int32 led){
+    //Apagar todos los pin de leds.
+    output_low(PIN_B0);
+    output_low(PIN_B1);
+    output_low(PIN_B2);
+    output_low(PIN_B3);
+    output_low(PIN_B4);
+    //Matriz A Enable
+    output_high(PIN_B3);
+    //Descomposicion LED para encender demux
+    ((led & 1) == 1) ? output_high(PIN_B0):output_low(PIN_B0);
+    ((led & 2) == 2) ? output_high(PIN_B1):output_low(PIN_B1);
+    ((led & 4) == 4) ? output_high(PIN_B2):output_low(PIN_B2);
+}
+
+void led_on_off(int32 led, int32 timeon){
+    printf("Led %Ld\n\r",led);
+    //Apagar todos los pin de leds.
+    output_low(PIN_B0);
+    output_low(PIN_B1);
+    output_low(PIN_B2);
+    output_low(PIN_B3);
+    output_low(PIN_B4);
+    //Matriz A Enable
+    output_high(PIN_B3);
+    //Descomposicion LED para encender demux
+    ((led & 1) == 1) ? output_high(PIN_B0):output_low(PIN_B0);
+    ((led & 2) == 2) ? output_high(PIN_B1):output_low(PIN_B1);
+    ((led & 4) == 4) ? output_high(PIN_B2):output_low(PIN_B2);
+    //Time encendido
+    delay_ms(timeon);
+    led_off();
+}
+
+void motor_off(){
+    output_low(PIN_A1); 
+    delay_ms(100);
+    output_low(PIN_A2);
+    output_low(PIN_A3);
+    output_low(PIN_A4);
+}
+
+int32 motores4(int32 pasos, int dir,int32 velocidad)
 {
-    int32 steps=0;
+    int32 y=0;
     int1 status=1;
     output_low(PIN_A1);  //STEP
-    dir?output_high(PIN_A0):output_low(PIN_A0);
-    delay_ms(100);
-    for(steps=0;steps<pasos;steps++)
+    (dir == 1)?output_high(PIN_A0):output_low(PIN_A0);
+    delay_ms(velocidad);
+    for(y=0;y<pasos;y++)
     {
         output_low(PIN_A1);
         output_high(PIN_A1);
         status = input_state(PIN_A5);
         if (status == 0){
-            printf("status sensor ->%d<- => tapado  \n\r",status);
-            return steps;
+            printf("status sensor ->%d<-  \n\r",status);
+            return y;
+        }
+        delay_us(velocidad);
+    }
+    return y;
+}
+int32 motores3(int32 pasos, int dir)
+{
+    int32 y=0;
+    int1 status=1;
+    output_low(PIN_A1);  //STEP
+    (dir == 1)?output_high(PIN_A0):output_low(PIN_A0);
+    delay_ms(100);
+    for(y=0;y<pasos;y++)
+    {
+        output_low(PIN_A1);
+        output_high(PIN_A1);
+        status = input_state(PIN_A5);
+        if (status == 0){
+            printf("status sensor ->%d<-  \n\r",status);
+            return y;
         }
         delay_us(200);
     }
-    return steps;
+    return y;
 }
 
 int motores2(int32 pasos, int dir)
 {
-    int32 steps=0;
+    int32 y=0;
     output_low(PIN_A1);  //STEP
-    dir?output_high(PIN_A0):output_low(PIN_A0);
+    (dir == 1)?output_high(PIN_A0):output_low(PIN_A0);
     delay_ms(100);
-    for(steps=0;steps<pasos;steps++)
+    for(y=0;y<pasos;y++)
     {
         output_low(PIN_A1);
         output_high(PIN_A1);
@@ -343,25 +338,6 @@ int motores2(int32 pasos, int dir)
     return 0;
 }
 
-void motores(int32 pasos, int dir)
-{
-    int32 steps=0;
-    output_low(PIN_A1);  //STEP
-    dir?output_high(PIN_A0):output_low(PIN_A0);
-    delay_ms(100);
-    for(steps=0;steps<pasos;steps++)
-    {
-        output_low(PIN_A1);
-        output_high(PIN_A1);
-        delay_us(200);
-    }
 
-apagamotor: // Label para apagar motor y cesar el giro.
 
-    output_low(PIN_A1); // STEP a cero.
-    delay_ms(100);
-    output_low(PIN_A2);  //Apaga motor.
-    output_low(PIN_A3);
-    output_low(PIN_A4);
-}
 
