@@ -160,15 +160,20 @@ void main()
                 pasos_restantes = pasos;
                 motor_on(motor); 
                 while(pasos_restantes > 0){
-                    printf("pasos_restantes ->%Ld<-  \n\r",pasos_restantes);
+                    printf("pasos_restantes: %Ld\n\r",pasos_restantes);
+                    printf("steps: %Ld\n\r",steps);
                     delay_us(200);
-                    steps = motores4(steps,dir,velocidad);
+                    steps = motores4(pasos_restantes,dir,velocidad);
                     delay_us(200);
                     dir = (dir == 0)?1:0;
                     motores2(100,dir);
+                    printf("new steps: %Ld\n\r",steps);
                     pasos_restantes = pasos_restantes - steps;
+                    printf("new pasos_restantes: %Ld\n\r",pasos_restantes);
+                    if (pasos_restantes <=0)
+                        break;
                 }
-                printf("pasos_restantes fin \n\r");
+                printf("pasos_restantes fin: %Ld  step->%Ld<-\n\r",pasos_restantes,steps);
 
             case '8': 
                 printf("Setup Calibracion Quick\n\r");
@@ -301,6 +306,7 @@ int32 motores4(int32 pasos, int dir,int32 velocidad)
         }
         delay_us(velocidad);
     }
+    printf("return pasos dados ->%Ld<-  \n\r",y);
     return y;
 }
 int32 motores3(int32 pasos, int dir)
