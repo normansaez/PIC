@@ -20,9 +20,10 @@ void led_on_off(int32 led, int32 timeon);
 int motores2(int32 pasos, int dir);
 int32 motores3(int32 pasos, int dir);
 int32 motores4(int32 pasos, int dir,int32 velocidad);
-void motor_on(int32 motor, int32 pasos, int32 direccion);
+void motor_move(int32 motor, int32 pasos, int32 direccion);
 void led_on(int32 led);
 void led_off();
+void motor_on(int32 motor);
 
 void main()
 {
@@ -136,13 +137,37 @@ void main()
                 motor = atoi32(leido_pantalla);               
                 break;
 
+            case '1':
+                led_on(led);
+                break;
+
+            case '2':
+                led_off();
+                break;
+
             case '3':
-                motor_on(motor,pasos,direccion);
+                motor_move(motor,pasos,direccion);
                 break;
 
             case '4':
                 led_on_off(led,exposicion);
                 break;
+
+            case '5': 
+                int32 pasos_restantes = 1;
+                int32 steps;
+                int dir;
+                dir = direccion;
+                steps = pasos;
+                motor_on(motor); 
+                while(pasos_restantes != 0){
+                    delay_us(200);
+                    steps = motores4(steps,dir,velocidad);
+                    delay_us(200);
+                    motores2(100,dir);
+                    pasos_restantes = pasos - steps;
+                    (dir == 0)?1:0;
+                }
 
             case '8': 
                 printf("Setup Calibracion Quick\n\r");
@@ -192,7 +217,13 @@ void main()
 
 }  //FIN MAIN
 
-void motor_on(int32 motor, int32 pasos, int32 direccion){
+void motor_on(int32 motor){
+    (motor == 1) ? output_high(PIN_A2):output_low(PIN_A2);
+    (motor == 2) ? output_high(PIN_A3):output_low(PIN_A3);
+    (motor == 3) ? output_high(PIN_A4):output_low(PIN_A4);
+}
+
+void motor_move(int32 motor, int32 pasos, int32 direccion){
     (motor == 1) ? output_high(PIN_A2):output_low(PIN_A2);
     (motor == 2) ? output_high(PIN_A3):output_low(PIN_A3);
     (motor == 3) ? output_high(PIN_A4):output_low(PIN_A4);
