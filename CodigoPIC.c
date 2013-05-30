@@ -48,7 +48,7 @@ void main()
 
 
     // ************************ CONFIGURACIÓN PWM1 y PWM2: ************************
-    int32 brillo=50;
+    int32 brillo=0;
     int32 exposicion=500;   //Tiempo de exposición de la cámara en [ms]
     int32 der_steps=0;
     int32 izq_steps=0;
@@ -105,12 +105,11 @@ void main()
                 break;
 
             case 'b':
-inicia1:
-                printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) y pulse (brillo) [ENTER]:\n\r");
-                fgets(leido_pantalla);
-                brillo=atoi(leido_pantalla);
-                if(brillo>100 || brillo<=0)
-                    goto inicia1;
+                while(brillo>100 || brillo<=0){
+                    printf("Ingrese Ciclo de Trabajo para PWM1 (0-100) y pulse (brillo) [ENTER]:\n\r");
+                    fgets(leido_pantalla);
+                    brillo=atoi(leido_pantalla);
+                }
                 set_pwm1_duty(brillo*20000000/(100*2000*16));
                 set_pwm2_duty(brillo*20000000/(100*2000*16));
                 break;
@@ -161,13 +160,12 @@ inicia1:
                 der_steps = motores3(2147483640,DERECHA);
                 printf("izq_steps ->%Ld<-  \n\r",izq_steps);
                 printf("der_steps ->%Ld<-  \n\r",der_steps);
-                goto loopInfinito;
-loopInfinito:
-                motores2(izq_steps,IZQUIERDA);
-                delay_us(200);
-                motores2(der_steps,DERECHA);
-                delay_us(200);
-                goto loopInfinito;
+                while(true){
+                    motores2(izq_steps,IZQUIERDA);
+                    delay_us(200);
+                    motores2(der_steps,DERECHA);
+                    delay_us(200);
+                }
 
             case '9': 
                 printf("Setup Velocidad ...\n\r");
