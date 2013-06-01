@@ -161,19 +161,15 @@ void main()
                 motor_on(motor); 
                 while(pasos_restantes > 0){
                     printf("pasos_restantes: %Ld\n\r",pasos_restantes);
-                    //printf("steps: %Ld\n\r",steps);
                     delay_us(200);
                     steps = motores4(pasos_restantes,dir,velocidad);
                     delay_us(200);
                     dir = (dir == 0)?1:0;
                     motores2(100,dir);
-                    //printf("new steps: %Ld\n\r",steps);
                     pasos_restantes = pasos_restantes - steps;
-                    //printf("new pasos_restantes: %Ld\n\r",pasos_restantes);
                     if (pasos_restantes <=0)
                         break;
                 }
-                //printf("pasos_restantes fin: %Ld  step->%Ld<-\n\r",pasos_restantes,steps);
                 break;
 
             case '6': 
@@ -194,6 +190,19 @@ void main()
                     pasos_restantes2 = pasos_restantes2 - steps2;
                     if (pasos_restantes2 <=0)
                         pasos_restantes2 = pasos;
+                }
+                break;
+
+            case '7':
+                int32 steps3; 
+                motor_on(motor); 
+                steps3 = motores4(pasos,direccion,velocidad);
+                if (steps3 - pasos < 0){
+                    direccion = (direccion == 0)?1:0;
+                    motores2(100,direccion);
+                    delay_us(200);
+                    motores3(2147483640,direccion);
+                    direccion = (direccion == 0)?1:0;
                 }
                 break;
 
