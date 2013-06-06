@@ -165,7 +165,7 @@ void main()
                     steps = motores4(pasos_restantes,dir,velocidad);
                     delay_us(200);
                     dir = (dir == 0)?1:0;
-                    motores2(100,dir);
+                    motores2(2000,dir);
                     pasos_restantes = pasos_restantes - steps;
                     if (pasos_restantes <=0)
                         break;
@@ -186,7 +186,7 @@ void main()
                     steps2 = motores4(pasos_restantes2,dir2,velocidad);
                     delay_us(200);
                     dir2 = (dir2 == 0)?1:0;
-                    motores2(100,dir2);
+                    motores2(2000,dir2);
                     pasos_restantes2 = pasos_restantes2 - steps2;
                     if (pasos_restantes2 <=0)
                         pasos_restantes2 = pasos;
@@ -199,7 +199,7 @@ void main()
                 steps3 = motores4(pasos,direccion,velocidad);
                 if (steps3 - pasos < 0){
                     direccion = (direccion == 0)?1:0;
-                    motores2(100,direccion);
+                    motores2(2000,direccion);
                     delay_us(200);
                     motores3(2147483640,direccion);
                     direccion = (direccion == 0)?1:0;
@@ -211,11 +211,11 @@ void main()
                 motor_on(motor); 
                 motores3(2147483640,DERECHA);
                 delay_us(200);
-                motores2(100,IZQUIERDA);
+                motores2(2000,IZQUIERDA);
                 delay_us(200);
                 izq_steps = motores3(2147483640,IZQUIERDA);
                 delay_us(200);
-                motores2(100,DERECHA);
+                motores2(2000,DERECHA);
                 delay_us(200);
                 der_steps = motores3(2147483640,DERECHA);
                 printf("izq_steps ->%Ld<-  \n\r",izq_steps);
@@ -230,11 +230,11 @@ void main()
             case '9': 
                 printf("Setup Velocidad ...\n\r");
                 output_high(PIN_A4); 
-                motores2(100,IZQUIERDA);
+                motores2(2000,IZQUIERDA);
                 delay_us(200);
                 izq_steps = motores3(2147483640,IZQUIERDA);
                 delay_us(200);
-                motores2(100,DERECHA);
+                motores2(2000,DERECHA);
                 delay_us(200);
                 der_steps = motores3(2147483640,DERECHA);
                 printf("izq_steps ->%Ld<-  \n\r",izq_steps);
