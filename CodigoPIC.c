@@ -163,12 +163,12 @@ void main()
                     printf("pasos_restantes: %Ld\n\r",pasos_restantes);
                     delay_us(200);
                     steps = motores4(pasos_restantes,dir,velocidad);
-                    delay_us(200);
-                    dir = (dir == 0)?1:0;
-                    motores2(2000,dir);
                     pasos_restantes = pasos_restantes - steps;
                     if (pasos_restantes <=0)
                         break;
+                    delay_us(200);
+                    dir = (dir == 0)?1:0;
+                    motores2(2000,dir);
                 }
                 break;
 
@@ -203,6 +203,7 @@ void main()
                     delay_us(200);
                     motores3(2147483640,direccion);
                     direccion = (direccion == 0)?1:0;
+                    motores2(2000,direccion);
                 }
                 break;
 
