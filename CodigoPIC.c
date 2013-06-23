@@ -14,14 +14,13 @@
 #use fast_io(a)
 #use fast_io(b)
 
-void motor_off();
-void motores(int32 pasos, int dir);
-int motores2(int32 pasos, int dir);
-int32 motores3(int32 pasos, int dir);
-int32 motores4(int32 pasos, int dir,int32 velocidad);
+int move_motor_skip_sensor(int32 pasos, int dir);
+int32 move_motor_with_sensor(int32 pasos, int dir,int32 velocidad);
+
 void led_on(int32 led);
 void led_off();
 void motor_on(int32 motor);
+void motor_off();
 
 void main()
 {
@@ -53,9 +52,11 @@ void main()
     int32 izq_steps=0;
     int32 led=0;
     int32 motor=0;
-    int32 direccion=0;
     int32 pasos=0;
     int32 velocidad=0;
+    int direccion=0;
+    int dir=0;
+    //---
     char c;
     int i=0;
     char command[60];
@@ -137,52 +138,69 @@ void main()
                 break;
 
             case '3':
-                motor_on(motor);
-                motores2(pasos,direccion);
-                motor_off();
-                break;
-
-            case '4':
                 led_on(led);
                 delay_ms(exposicion);
                 led_off();
                 break;
 
+            case '4':
+                motor_on(motor);
+                move_motor_skip_sensor(pasos,direccion);
+                motor_off();
+                break;
+
             case '5': 
                 int32 pasos_restantes;
                 int32 steps;
-                int dir;
                 dir = direccion;
                 steps = pasos;
                 pasos_restantes = pasos;
                 motor_on(motor); 
                 while(pasos_restantes > 0){
                     delay_us(200);
-                    steps = motores4(pasos_restantes,dir,velocidad);
+                    steps = move_motor_with_sensor(pasos_restantes,dir,velocidad);
                     pasos_restantes = pasos_restantes - steps;
                     if (pasos_restantes <=0)
                         break;
                     delay_us(200);
                     dir = (dir == 0)?1:0;
-                    motores2(2000,dir);
+                    move_motor_skip_sensor(2000,dir);
                 }
+                break;
+
+            case '6':
+                int1 status=1;
+                dir = direccion;
+                motor_on(motor);
+                move_motor_with_sensor(pasos,direccion,velocidad);
+                status = input_state(PIN_A5);
+                if (status == 0){
+                    dir = (dir == 0)?1:0;
+                    move_motor_skip_sensor(2000,dir);
+                    delay_us(200);
+                    move_motor_with_sensor(2147483640,dir,velocidad);
+                    delay_us(200);
+                    dir = (dir == 0)?1:0;
+                    move_motor_skip_sensor(2000,dir); 
+                }
+                motor_off();
                 break;
 
             case '8': 
                 motor_on(motor); 
-                motores3(2147483640,DERECHA);
+                move_motor_with_sensor(2147483640,DERECHA,velocidad);
                 delay_us(200);
-                motores2(2000,IZQUIERDA);
+                move_motor_skip_sensor(2000,IZQUIERDA);
                 delay_us(200);
-                izq_steps = motores3(2147483640,IZQUIERDA);
+                izq_steps = move_motor_with_sensor(2147483640,IZQUIERDA,velocidad);
                 delay_us(200);
-                motores2(2000,DERECHA);
+                move_motor_skip_sensor(2000,DERECHA);
                 delay_us(200);
-                der_steps = motores3(2147483640,DERECHA);
+                der_steps = move_motor_with_sensor(2147483640,DERECHA,velocidad);
                 while(true){
-                    motores2(izq_steps,IZQUIERDA);
+                    move_motor_skip_sensor(izq_steps,IZQUIERDA);
                     delay_us(200);
-                    motores2(der_steps,DERECHA);
+                    move_motor_skip_sensor(der_steps,DERECHA);
                     delay_us(200);
                 }
         }
@@ -227,7 +245,7 @@ void motor_off(){
     output_low(PIN_A4);
 }
 
-int32 motores4(int32 pasos, int dir,int32 velocidad)
+int32 move_motor_with_sensor(int32 pasos, int dir,int32 velocidad)
 {
     int32 y=0;
     int1 status=1;
@@ -246,27 +264,8 @@ int32 motores4(int32 pasos, int dir,int32 velocidad)
     }
     return y;
 }
-int32 motores3(int32 pasos, int dir)
-{
-    int32 y=0;
-    int1 status=1;
-    output_low(PIN_A1);
-    (dir == 1)?output_high(PIN_A0):output_low(PIN_A0);
-    delay_ms(100);
-    for(y=0;y<pasos;y++)
-    {
-        output_low(PIN_A1);
-        output_high(PIN_A1);
-        status = input_state(PIN_A5);
-        if (status == 0){
-            return y;
-        }
-        delay_us(200);
-    }
-    return y;
-}
 
-int motores2(int32 pasos, int dir)
+int move_motor_skip_sensor(int32 pasos, int dir)
 {
     int32 y=0;
     output_low(PIN_A1);
