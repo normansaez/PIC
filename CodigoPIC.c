@@ -120,10 +120,8 @@ void main()
                 set_pwm1_duty(brillo*20000000/(100*2000*16));
                 set_pwm2_duty(brillo*20000000/(100*2000*16));
             }
-            if (i == 8){
+            if (i == 8)
                 strcpy(action,ptr_instruction);
-                continue;
-            }
         }
         c = '0';
 
