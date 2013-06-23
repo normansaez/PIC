@@ -129,22 +129,26 @@ void main()
         {
             case '1':
                 led_on(led);
+                printf("ok");
                 break;
 
             case '2':
                 led_off();
+                printf("ok");
                 break;
 
             case '3':
                 led_on(led);
                 delay_ms(exposicion);
                 led_off();
+                printf("ok");
                 break;
 
             case '4':
                 motor_on(motor);
                 move_motor_skip_sensor(pasos,direccion);
                 motor_off();
+                printf("ok");
                 break;
 
             case '5': 
@@ -164,6 +168,7 @@ void main()
                     dir = (dir == 0)?1:0;
                     move_motor_skip_sensor(2000,dir);
                 }
+                printf("ok");
                 break;
 
             case '6':
@@ -182,6 +187,7 @@ void main()
                     move_motor_skip_sensor(2000,dir); 
                 }
                 motor_off();
+                printf("ok");
                 break;
 
             case '8': 
