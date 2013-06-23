@@ -1,2 +1,5 @@
 all:
-	gcc -o test CodigoPIC_OSX.c -I.
+	gcc -Wall -o test pointer.c -I.
+clean:
+	rm test
+

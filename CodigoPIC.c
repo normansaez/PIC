@@ -1,6 +1,7 @@
 #include <16F877A.h> //Carga el PIC a utilizar.
 #include <stdio.h>  // Permite usar librería de ATOI (convierte string a entero)
 #include <stdlib.h> // idem requerido.
+#include <strings.h>
 
 #define DERECHA 1
 #define IZQUIERDA 0
@@ -81,12 +82,29 @@ void main()
         output_low(PIN_A2);
         output_low(PIN_A3);
         output_low(PIN_A4);
+        char c;
+        char command[60];
+        int i=0;
+        char *ptr_command;
+        char *save_ptr_command;
+        char *instruction;
+        char delim[1] = ",";
 
+        while (( c = getchar() ) != '\n'){
+            command[i++] = (char)c;
+            if (i == 60)
+                break;
+        }
+        command[i] = '\0';
+        for (i = 1, ptr_command = command; ; i++, ptr_command = NULL)
+        {
+            instruction = strtok_r(ptr_command,delim, &save_ptr_command);
+            if (instruction == NULL)
+                break;
+            //printf("%d: %s\n", i, instruction);
 
-        printf("Set parameters: e=exposicion(%Ld), v=velocidad(%Ld)\n\r",exposicion,velocidad);
-        printf("                b=brillo(%Ld), d=direccion(%Ld), p=pasos(%Ld)\n\r",brillo,direccion,pasos);
-        printf("                l=led(%Ld), m=motores(%Ld) \n\r",led,motor);
-        seleccionar=getc();
+        }
+
 
         switch(seleccionar)
         {
