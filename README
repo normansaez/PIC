@@ -1,0 +1,26 @@
+            //MOTOR
+            if (i == 1)
+                //motor
+            if (i == 2)
+                //velocidad
+            if (i == 3)
+                //direccion
+            if (i == 4)
+                //pasos
+            //LED
+            if (i == 5)
+                //led
+            if (i == 6)
+                //exposicion
+            if (i == 7){
+                //brillo
+            if (i == 8){
+                strcpy(action,ptr_instruction);
+///actions
+1 = led on
+2 = led off
+3 = led on/off
+4 = move motor sin sensor
+5 = move motor con sensor comiendo pasos
+6 = move motor con sensor y reset
+8 = calibracion loop infinito
