@@ -51,8 +51,8 @@ void main()
     // ************************ CONFIGURACIÓN PWM1 y PWM2: ************************
     int32 brillo=0;
     int32 exposicion=500;   //Tiempo de exposición de la cámara en [ms]
-    int32 der_steps=0;
-    int32 izq_steps=0;
+//    int32 der_steps=0;
+//    int32 izq_steps=0;
     int32 led=0;
     int32 motor=0;
     int32 direccion=0;
@@ -173,79 +173,59 @@ void main()
                 break;
 
             case '6': 
-                int32 pasos_restantes2;
-                int32 steps2;
-                int dir2;
-                dir2 = direccion;
-                steps2 = pasos;
-                pasos_restantes2 = pasos;
+                int32 stepsmmm;
                 motor_on(motor); 
-                while(true){
-                    printf("pasos restantes: %Ld\n\r",pasos_restantes2);
-                    delay_us(200);
-                    steps2 = motores4(pasos_restantes2,dir2,velocidad);
-                    delay_us(200);
-                    dir2 = (dir2 == 0)?1:0;
-                    motores2(2000,dir2);
-                    pasos_restantes2 = pasos_restantes2 - steps2;
-                    if (pasos_restantes2 <=0)
-                        pasos_restantes2 = pasos;
-                }
+                motores4(pasos,direccion,velocidad);
+                motor_off();
+                printf("%Ld\n\r",stepsmmm);
+                
                 break;
 
             case '7':
-                int32 steps3; 
                 motor_on(motor); 
-                steps3 = motores4(pasos,direccion,velocidad);
-                if (steps3 - pasos < 0){
-                    direccion = (direccion == 0)?1:0;
-                    motores2(2000,direccion);
-                    delay_us(200);
-                    motores3(2147483640,direccion);
-                    direccion = (direccion == 0)?1:0;
-                    motores2(2000,direccion);
-                }
+                motores2(pasos,direccion);
+                motor_off(); 
                 break;
 
-            case '8': 
-                printf("Setup Calibracion Quick\n\r");
-                motor_on(motor); 
-                motores3(2147483640,DERECHA);
-                delay_us(200);
-                motores2(2000,IZQUIERDA);
-                delay_us(200);
-                izq_steps = motores3(2147483640,IZQUIERDA);
-                delay_us(200);
-                motores2(2000,DERECHA);
-                delay_us(200);
-                der_steps = motores3(2147483640,DERECHA);
-                printf("izq_steps ->%Ld<-  \n\r",izq_steps);
-                printf("der_steps ->%Ld<-  \n\r",der_steps);
-                while(true){
-                    motores2(izq_steps,IZQUIERDA);
-                    delay_us(200);
-                    motores2(der_steps,DERECHA);
-                    delay_us(200);
-                }
-
-            case '9': 
-                printf("Setup Velocidad ...\n\r");
-                output_high(PIN_A4); 
-                motores2(2000,IZQUIERDA);
-                delay_us(200);
-                izq_steps = motores3(2147483640,IZQUIERDA);
-                delay_us(200);
-                motores2(2000,DERECHA);
-                delay_us(200);
-                der_steps = motores3(2147483640,DERECHA);
-                printf("izq_steps ->%Ld<-  \n\r",izq_steps);
-                printf("der_steps ->%Ld<-  \n\r",der_steps);
-
-                motores4(izq_steps,IZQUIERDA,velocidad);
-                delay_us(200);
-                motores4(der_steps,DERECHA,200);
-                delay_us(200);
-                break;
+//            case '8': 
+//                printf("Setup Calibracion Quick\n\r");
+//                motor_on(motor); 
+//                motores3(2147483640,DERECHA);
+//                delay_us(200);
+//                motores2(2000,IZQUIERDA);
+//                delay_us(200);
+//                izq_steps = motores3(2147483640,IZQUIERDA);
+//                delay_us(200);
+//                motores2(2000,DERECHA);
+//                delay_us(200);
+//                der_steps = motores3(2147483640,DERECHA);
+//                printf("izq_steps ->%Ld<-  \n\r",izq_steps);
+//                printf("der_steps ->%Ld<-  \n\r",der_steps);
+//                while(true){
+//                    motores2(izq_steps,IZQUIERDA);
+//                    delay_us(200);
+//                    motores2(der_steps,DERECHA);
+//                    delay_us(200);
+//                }
+//
+//            case '9': 
+//                printf("Setup Velocidad ...\n\r");
+//                output_high(PIN_A4); 
+//                motores2(2000,IZQUIERDA);
+//                delay_us(200);
+//                izq_steps = motores3(2147483640,IZQUIERDA);
+//                delay_us(200);
+//                motores2(2000,DERECHA);
+//                delay_us(200);
+//                der_steps = motores3(2147483640,DERECHA);
+//                printf("izq_steps ->%Ld<-  \n\r",izq_steps);
+//                printf("der_steps ->%Ld<-  \n\r",der_steps);
+//
+//                motores4(izq_steps,IZQUIERDA,velocidad);
+//                delay_us(200);
+//                motores4(der_steps,DERECHA,200);
+//                delay_us(200);
+//                break;
 
         }
 
