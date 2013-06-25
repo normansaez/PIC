@@ -131,7 +131,7 @@ void main()
 
             case '3':
                 motor_on(motor);
-                motores4(pasos_restantes,dir,velocidad);
+                motores4(pasos,direccion,velocidad);
                 break;
 
             case '4':
