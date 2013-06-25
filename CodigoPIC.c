@@ -87,11 +87,13 @@ void main()
             case 'v':
                 fgets(leido_pantalla);
                 velocidad=atoi32(leido_pantalla);
+                printf("%Ld",velocidad);
                 break;
 
             case 'e': 
                 fgets(leido_pantalla);
                 exposicion=atoi32(leido_pantalla);
+                printf("%Ld",exposicion);
                 break;
 
             case 'b':
@@ -99,43 +101,52 @@ void main()
                 brillo=atoi(leido_pantalla);
                 set_pwm1_duty(brillo*20000000/(100*2000*16));
                 set_pwm2_duty(brillo*20000000/(100*2000*16));
+                printf("%Ld",brillo);
                 break;
 
             case 'l':
                 fgets(leido_pantalla);
                 led=atoi32(leido_pantalla);
+                printf("%Ld",led);
                 break;
 
             case 'd':
                 fgets(leido_pantalla);
                 direccion = atoi32(leido_pantalla);               
+                printf("%Ld",direccion);
                 break;
 
             case 'p':
                 fgets(leido_pantalla);
                 pasos = atoi32(leido_pantalla);               
+                printf("%Ld",pasos);
                 break;
 
             case 'm':
                 fgets(leido_pantalla);
                 motor = atoi32(leido_pantalla);               
+                printf("%Ld",motor);
                 break;
 
             case '1':
                 led_on(led);
+                printf("ok");
                 break;
 
             case '2':
                 led_off();
+                printf("ok");
                 break;
 
             case '3':
                 motor_on(motor);
                 motores4(pasos,direccion,velocidad);
+                printf("ok");
                 break;
 
             case '4':
                 motor_off();
+                printf("ok");
                 break;
 
             case '5': 
@@ -156,6 +167,7 @@ void main()
                     dir = (dir == 0)?1:0;
                     motores2(2000,dir);
                 }
+                printf("ok");
                 break;
 
             case '6': 
@@ -170,6 +182,7 @@ void main()
                 motor_on(motor); 
                 motores2(pasos,direccion);
                 motor_off(); 
+                printf("ok");
                 break;
         }
 
