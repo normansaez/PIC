@@ -1,0 +1,7 @@
+1.- led on
+2.- led off
+3.- motor on (sensor)
+4.- motor off (just turn off)
+5.- motor consuming steps (sensor)
+6.- motor return steps (sensor)
+7.- motor skip sensor 
